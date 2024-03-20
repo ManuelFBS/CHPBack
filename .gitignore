@@ -1,0 +1,14 @@
+# Dependencies output
+node_modules
+
+# Enviropment vars
+.env
+
+# Others
+.prettierrc
+
+# Security
+sectok.ts
+
+# Others
+misc
