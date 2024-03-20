@@ -4,7 +4,7 @@ node_modules
 # Enviropment vars
 .env
 
-# Others
+# Code Format
 .prettierrc
 
 # Security
@@ -12,3 +12,5 @@ sectok.ts
 
 # Others
 misc
+.vercel
+vercel.json
