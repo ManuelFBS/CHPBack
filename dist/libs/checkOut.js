@@ -16,7 +16,6 @@ exports.CheckOutUserOwner = void 0;
 const User_1 = require("../entities/User");
 const dotenv_1 = __importDefault(require("dotenv"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const sectok_1 = require("../validations/tokens/sectok");
 dotenv_1.default.config();
 const CheckOutUserOwner = (tokenHeader, userRol) => __awaiter(void 0, void 0, void 0, function* () {
     const token = tokenHeader;
@@ -31,7 +30,7 @@ const CheckOutUserOwner = (tokenHeader, userRol) => __awaiter(void 0, void 0, vo
     }
     let payload;
     try {
-        payload = jsonwebtoken_1.default.verify(token, process.env.SECRET_KEY_TOKEN || sectok_1.SECTOK);
+        payload = jsonwebtoken_1.default.verify(token, process.env.SECRET_KEY_TOKEN || 'ExtToks112244');
     }
     catch (error) {
         console.error('Error verifying token:', error);

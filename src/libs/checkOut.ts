@@ -1,7 +1,6 @@
 import { User } from '../entities/User';
 import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
-import { SECTOK } from '../validations/tokens/sectok';
 import { IPayload } from '../validations/tokens/verifyToken';
 
 dotenv.config();
@@ -27,7 +26,7 @@ export const CheckOutUserOwner = async (
   try {
     payload = jwt.verify(
       token,
-      process.env.SECRET_KEY_TOKEN || SECTOK,
+      process.env.SECRET_KEY_TOKEN || 'ExtToks112244',
     );
   } catch (error) {
     console.error('Error verifying token:', error);

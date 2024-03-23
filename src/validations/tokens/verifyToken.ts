@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import dotenv from 'dotenv';
 import jwt, { TokenExpiredError } from 'jsonwebtoken';
-import { SECTOK } from './sectok';
 
 dotenv.config();
 
@@ -25,7 +24,7 @@ export const TokenValidation = (
   try {
     const payload = jwt.verify(
       token,
-      process.env.SECRET_KEY_TOKEN || SECTOK,
+      process.env.SECRET_KEY_TOKEN || 'ExtToks112244',
     ) as IPayload;
 
     // Check if the token has expired...

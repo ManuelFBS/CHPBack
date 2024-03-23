@@ -6,14 +6,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.token = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv_1 = __importDefault(require("dotenv"));
-const sectok_1 = require("./sectok");
 dotenv_1.default.config();
 const token = (savedUser) => {
     const payload = {
         _id: savedUser.id,
         rol: savedUser.rol,
     };
-    const token = jsonwebtoken_1.default.sign(payload, process.env.SECRET_KEY_TOKEN || sectok_1.SECTOK, { expiresIn: '2d' });
+    const token = jsonwebtoken_1.default.sign(payload, process.env.SECRET_KEY_TOKEN || 'ExtToks112244', { expiresIn: '2d' });
     return token;
 };
 exports.token = token;

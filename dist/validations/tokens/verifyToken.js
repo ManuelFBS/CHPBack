@@ -29,14 +29,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.TokenValidation = void 0;
 const dotenv_1 = __importDefault(require("dotenv"));
 const jsonwebtoken_1 = __importStar(require("jsonwebtoken"));
-const sectok_1 = require("./sectok");
 dotenv_1.default.config();
 const TokenValidation = (req, res, next) => {
     const token = req.header('auth-token');
     if (!token)
         return res.status(401).json('Access denied...!');
     try {
-        const payload = jsonwebtoken_1.default.verify(token, process.env.SECRET_KEY_TOKEN || sectok_1.SECTOK);
+        const payload = jsonwebtoken_1.default.verify(token, process.env.SECRET_KEY_TOKEN || 'ExtToks112244');
         // Check if the token has expired...
         if (Date.now() >= payload.exp * 1000) {
             return res

@@ -1,7 +1,6 @@
 import { UserEntity } from '../../interfaces/userEntity';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
-import { SECTOK } from './sectok';
 
 dotenv.config();
 
@@ -13,7 +12,7 @@ export const token = (savedUser: UserEntity): string => {
 
   const token = jwt.sign(
     payload,
-    process.env.SECRET_KEY_TOKEN || SECTOK,
+    process.env.SECRET_KEY_TOKEN || 'ExtToks112244',
     { expiresIn: '2d' },
   );
 
