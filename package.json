@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "npm install --no-audit && node dist/index.js",
+    "start": "node dist/index.js",
     "dev": "concurrently \"tsc -w\" \"ts-node-dev src/index.ts\"",
     "build": "tsc"
   },
