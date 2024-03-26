@@ -6,6 +6,8 @@ import { decryptPassword } from '../../validations/password/decrypted';
 import { token } from '../../validations/tokens/token';
 import { isEmailType } from '../../libs/vartype';
 
+const invalidatedTokens: string[] = [];
+
 export const signUp = async (
   req: Request,
   res: Response,
@@ -101,6 +103,30 @@ export const signIn = async (
     return res
       .header('auth-token', token(user))
       .json(responseObject);
+  } catch (error) {
+    if (error instanceof Error) {
+      return res.status(500).json({ error: error.message });
+    } else {
+      return res.status(500).json(error);
+    }
+  }
+};
+
+export const signOut = async (
+  req: Request,
+  res: Response,
+): Promise<Response> => {
+  try {
+    // Obtener el token de la solicitud...
+    const token = req.header('auth-tokn');
+
+    if (!token)
+      return res.status(401).json('Access denied...!');
+
+    // Invalidar el token, añadiéndolo a la lista negra...
+    invalidatedTokens.push(token);
+
+    return res.json({ message: 'Logout successful !' });
   } catch (error) {
     if (error instanceof Error) {
       return res.status(500).json({ error: error.message });
