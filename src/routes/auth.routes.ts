@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import {
   signIn,
+  signOut,
   signUp,
 } from '../controllers/auth/auth.controller';
 import { SchemaValidation } from '../middlewares/schemaValidator.middleware';
@@ -15,5 +16,7 @@ router.post(
 );
 
 router.post('/signin', signIn);
+
+router.delete('/signout', signOut);
 
 export default router;
