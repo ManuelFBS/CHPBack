@@ -4,6 +4,8 @@ import jwt, { TokenExpiredError } from 'jsonwebtoken';
 
 dotenv.config();
 
+const invalidatedTokens: string[] = [];
+
 export interface IPayload {
   _id: string;
   iat: number;
@@ -22,6 +24,11 @@ export const TokenValidation = (
     return res.status(401).json('Access denied...!');
 
   try {
+    // Verifica si el token está en la lista de tokens invalidados...
+    if (invalidatedTokens.includes(token)) {
+      return res.status(401).json('Token invalidated...!');
+    }
+
     const payload = jwt.verify(
       token,
       process.env.SECRET_KEY_TOKEN || 'ExtToks112244',
