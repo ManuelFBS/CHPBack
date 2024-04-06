@@ -30,11 +30,16 @@ exports.TokenValidation = void 0;
 const dotenv_1 = __importDefault(require("dotenv"));
 const jsonwebtoken_1 = __importStar(require("jsonwebtoken"));
 dotenv_1.default.config();
+const invalidatedTokens = [];
 const TokenValidation = (req, res, next) => {
     const token = req.header('auth-token');
     if (!token)
         return res.status(401).json('Access denied...!');
     try {
+        // Verifica si el token está en la lista de tokens invalidados...
+        if (invalidatedTokens.includes(token)) {
+            return res.status(401).json('Token invalidated...!');
+        }
         const payload = jsonwebtoken_1.default.verify(token, process.env.SECRET_KEY_TOKEN || 'ExtToks112244');
         // Check if the token has expired...
         if (Date.now() >= payload.exp * 1000) {

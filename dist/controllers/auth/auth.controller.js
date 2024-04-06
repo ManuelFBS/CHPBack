@@ -20,12 +20,13 @@ var __rest = (this && this.__rest) || function (s, e) {
     return t;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.signIn = exports.signUp = void 0;
+exports.signOut = exports.signIn = exports.signUp = void 0;
 const User_1 = require("../../entities/User");
 const encrypted_1 = require("../../validations/password/encrypted");
 const decrypted_1 = require("../../validations/password/decrypted");
 const token_1 = require("../../validations/tokens/token");
 const vartype_1 = require("../../libs/vartype");
+const invalidatedTokens = [];
 const signUp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { name, lastName, age, email, phoneNumber, userName, password, rol, active, } = req.body;
     try {
@@ -102,4 +103,24 @@ const signIn = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.signIn = signIn;
+const signOut = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // Obtener el token de la solicitud...
+        const token = req.header('auth-tokn');
+        if (!token)
+            return res.status(401).json('Access denied...!');
+        // Invalidar el token, añadiéndolo a la lista negra...
+        invalidatedTokens.push(token);
+        return res.json({ message: 'Logout successful !' });
+    }
+    catch (error) {
+        if (error instanceof Error) {
+            return res.status(500).json({ error: error.message });
+        }
+        else {
+            return res.status(500).json(error);
+        }
+    }
+});
+exports.signOut = signOut;
 //# sourceMappingURL=auth.controller.js.map

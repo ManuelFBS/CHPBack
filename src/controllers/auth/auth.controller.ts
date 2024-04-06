@@ -118,7 +118,7 @@ export const signOut = async (
 ): Promise<Response> => {
   try {
     // Obtener el token de la solicitud...
-    const token = req.header('auth-tokn');
+    const token = req.header('auth-token');
 
     if (!token)
       return res.status(401).json('Access denied...!');
