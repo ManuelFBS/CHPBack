@@ -9,20 +9,14 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.User = exports.Roles = void 0;
+exports.User = void 0;
 const typeorm_1 = require("typeorm");
 const Comment_1 = require("./Comment");
-var Roles;
-(function (Roles) {
-    Roles["SuperAdmin"] = "superAdmin";
-    Roles["Admin"] = "admin";
-    Roles["Owner"] = "owner";
-    Roles["User"] = "user";
-})(Roles || (exports.Roles = Roles = {}));
+const user_roles_1 = require("./user.roles");
 let User = class User extends typeorm_1.BaseEntity {
     // Método para verificar si el usuario tiene el rol de 'owner'...
     isOwner() {
-        return this.rol === Roles.Owner;
+        return this.rol === user_roles_1.Roles.Owner;
     }
 };
 exports.User = User;
@@ -73,8 +67,8 @@ __decorate([
 __decorate([
     (0, typeorm_1.Column)({
         type: 'enum',
-        enum: Roles,
-        default: Roles.User,
+        enum: user_roles_1.Roles,
+        default: user_roles_1.Roles.User,
     }),
     __metadata("design:type", String)
 ], User.prototype, "rol", void 0);

@@ -15,12 +15,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 require("reflect-metadata");
 const app_1 = __importDefault(require("./app"));
 const database_1 = require("./db/database");
-// import { CreateAndInitializeDatasource } from './db/database';
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             yield database_1.AppDataSource.initialize();
-            // await CreateAndInitializeDatasource();
             console.log('Database connected...');
             const appListener = app_1.default.listen(app_1.default.get('port'), () => {
                 console.log(`Server is running on port: ${app_1.default.get('port')}`);

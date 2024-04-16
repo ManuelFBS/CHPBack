@@ -4,17 +4,34 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-export const token = (savedUser: UserEntity): string => {
+const SECRET: any = process.env.SECRET_KEY_TOKEN;
+
+export const token = (savedUser: UserEntity) => {
   const payload = {
     _id: savedUser.id,
     rol: savedUser.rol,
   };
 
-  const token = jwt.sign(
-    payload,
-    process.env.SECRET_KEY_TOKEN || 'ExtToks112244',
-    { expiresIn: '2d' },
-  );
-
-  return token;
+  return new Promise((resolve, reject) => {
+    jwt.sign(
+      payload,
+      SECRET,
+      { expiresIn: '2d' },
+      (err, token) => {
+        if (err) reject(err);
+        resolve(token);
+      },
+    );
+  });
+  // return new Promise((resolve, reject) => {
+  //   jwt.sign(
+  //     payload,
+  //     process.env.SECRET_KEY_TOKEN || 'ExtToks112244',
+  //     { expiresIn: '2d' },
+  //     (err, token) => {
+  //       if (err) reject(err);
+  //       resolve(token);
+  //     },
+  //   );
+  // });
 };

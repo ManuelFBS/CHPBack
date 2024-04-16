@@ -1,4 +1,5 @@
-import { Roles, User } from 'entities/User';
+import { User } from '../entities/User';
+import { Roles } from '../entities/user.roles';
 
 export interface UserEntity extends User {
   name: string;

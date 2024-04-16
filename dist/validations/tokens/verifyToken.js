@@ -1,66 +1,33 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TokenValidation = void 0;
 const dotenv_1 = __importDefault(require("dotenv"));
-const jsonwebtoken_1 = __importStar(require("jsonwebtoken"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 dotenv_1.default.config();
-const invalidatedTokens = [];
+const SECRET = process.env.SECRET_KEY_TOKEN;
+// export interface IPayload {
+//   _id: string;
+//   iat: number;
+//   exp: number;
+//   rol: string;
+// }
 const TokenValidation = (req, res, next) => {
-    const token = req.header('auth-token');
-    if (!token)
-        return res.status(401).json('Access denied...!');
-    try {
-        // Verifica si el token está en la lista de tokens invalidados...
-        if (invalidatedTokens.includes(token)) {
-            return res.status(401).json('Token invalidated...!');
-        }
-        const payload = jsonwebtoken_1.default.verify(token, process.env.SECRET_KEY_TOKEN || 'ExtToks112244');
-        // Check if the token has expired...
-        if (Date.now() >= payload.exp * 1000) {
+    const { 'auth-token': authToken } = req.cookies;
+    if (!authToken)
+        return res.status(401).json({
+            message: 'No token, authorization denied...!',
+        });
+    jsonwebtoken_1.default.verify(authToken, SECRET, (err, user) => {
+        if (err)
             return res
-                .status(401)
-                .json('Your session has expired. You must log in again...');
-        }
-        // req.userId = payload._id;
-        req.userRole = payload.rol;
+                .status(403)
+                .json({ message: 'Invalid token' });
+        req.allUserData = user;
         next();
-    }
-    catch (error) {
-        if (error instanceof jsonwebtoken_1.TokenExpiredError) {
-            return res
-                .status(401)
-                .json('Your session has expired. You must log in again...');
-        }
-        else {
-            return res.status(401).json('Invalid token...!');
-        }
-    }
+    });
 };
 exports.TokenValidation = TokenValidation;
 //# sourceMappingURL=verifyToken.js.map

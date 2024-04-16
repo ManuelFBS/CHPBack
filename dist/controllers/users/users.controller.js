@@ -20,13 +20,66 @@ var __rest = (this && this.__rest) || function (s, e) {
     return t;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteUser = exports.updateUser = exports.getUserByEmailOrUsername = exports.getAllUsers = void 0;
+exports.deleteUser = exports.updateUser = exports.getUserByEmailOrUsername = exports.getAllUsers = exports.createUser = void 0;
 const User_1 = require("../../entities/User");
+const user_roles_1 = require("../../entities/user.roles");
+const token_1 = require("../../validations/tokens/token");
 const vartype_1 = require("../../libs/vartype");
 const encrypted_1 = require("../../validations/password/encrypted");
 const decrypted_1 = require("../../validations/password/decrypted");
-const checkOut_1 = require("../../libs/checkOut");
 const database_1 = require("../../db/database");
+const checkOutAccess_1 = require("../../libs/checkOutAccess");
+const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { name, lastName, age, email, phoneNumber, userName, password, rol, active, } = req.body;
+    try {
+        if (!(0, checkOutAccess_1.AuthorizationSup)(req, res))
+            return res.status(401).json({
+                message: 'You are not authorized to carry out this operation...!',
+            });
+        const emailExists = yield User_1.User.findOne({
+            where: { email: email },
+        });
+        const phoneNumberExists = yield User_1.User.findOne({
+            where: { phoneNumber: phoneNumber },
+        });
+        if (emailExists)
+            return res
+                .status(400)
+                .json(['The email already exists...!']);
+        if (phoneNumberExists)
+            return res
+                .status(400)
+                .json(['This Phone number already exists...!']);
+        const passwordEncrypted = yield (0, encrypted_1.encrypted)(password);
+        const ageString = req.body.age;
+        const ageInt = parseInt(ageString, 10);
+        const user = new User_1.User();
+        user.name = name;
+        user.lastName = lastName;
+        user.age = ageInt;
+        user.email = email;
+        user.phoneNumber = phoneNumber;
+        user.userName = userName;
+        user.password = passwordEncrypted;
+        user.rol = rol || user_roles_1.Roles.User;
+        user.active = active || true;
+        const newUser = yield user.save();
+        // Remove password from newUser object
+        const { password: removedPassword } = newUser, userNoPassword = __rest(newUser, ["password"]);
+        const userToken = yield (0, token_1.token)(newUser);
+        res.cookie('auth-token', userToken);
+        return res.status(201).json(userNoPassword);
+    }
+    catch (error) {
+        if (error instanceof Error) {
+            return res.status(500).json({ error: error.message });
+        }
+        else {
+            return res.status(500).json(error);
+        }
+    }
+});
+exports.createUser = createUser;
 const getAllUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { orderBy } = req.query;
@@ -38,11 +91,8 @@ const getAllUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             orderOptions['id'] = 'ASC';
         }
         // Se verifica el rol del usuario para permitir o no el acceso
-        // única y exclusivamente a 'owner' y 'admin'...
-        if (req.userRole !== 'owner' &&
-            req.userRole !== 'admin') {
+        if (!(0, checkOutAccess_1.AuthorizationOA)(req, res))
             return res.status(403).json('Access denied...!');
-        }
         const users = yield User_1.User.find({
             select: [
                 'id',
@@ -164,7 +214,6 @@ const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             .set(newDataUser)
             .where(inputQuery, inputValue)
             .execute();
-        // || 'userName :userName', { userName: userName },
         return res.status(200).json({
             message: 'User data updated successfully...!',
         });
@@ -183,14 +232,10 @@ const deleteUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     const { id } = req.params;
     const { email, userName } = req.body;
     try {
-        const token = req.header('auth-token');
-        const userRol = req.userRole;
-        const authUser = yield (0, checkOut_1.CheckOutUserOwner)(token, userRol);
-        if (!authUser) {
+        if (!(0, checkOutAccess_1.AuthorizationSO)(req, res))
             return res.status(401).json({
-                message: 'Unauthorized or non-existent user...!',
+                message: 'You are not authorized to carry out this operation...!',
             });
-        }
         let user;
         let query;
         if (id) {

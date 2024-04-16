@@ -33,6 +33,13 @@ __decorate([
     __metadata("design:type", String)
 ], Article.prototype, "article", void 0);
 __decorate([
+    (0, typeorm_1.Column)({
+        default: 'Category...?',
+        nullable: false,
+    }),
+    __metadata("design:type", String)
+], Article.prototype, "category", void 0);
+__decorate([
     (0, typeorm_1.OneToMany)(() => Comment_1.Comment, (comment) => comment.article),
     __metadata("design:type", Array)
 ], Article.prototype, "comments", void 0);

@@ -1,12 +1,10 @@
 import 'reflect-metadata';
 import app from './app';
 import { AppDataSource } from './db/database';
-// import { CreateAndInitializeDatasource } from './db/database';
 
 async function main() {
   try {
     await AppDataSource.initialize();
-    // await CreateAndInitializeDatasource();
     console.log('Database connected...');
 
     const appListener = app.listen(app.get('port'), () => {

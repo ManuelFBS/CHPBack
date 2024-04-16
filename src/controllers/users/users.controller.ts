@@ -1,11 +1,95 @@
 import { Request, Response } from 'express';
-import { Roles, User } from '../../entities/User';
+import { User } from '../../entities/User';
+import { Roles } from '../../entities/user.roles';
+import { UserEntity } from '../../interfaces/userEntity';
+import { token } from '../../validations/tokens/token';
 import { isEmailType } from '../../libs/vartype';
-import { UserEntity } from 'interfaces/userEntity';
 import { encrypted } from '../../validations/password/encrypted';
 import { decryptPassword } from '../../validations/password/decrypted';
-import { CheckOutUserOwner } from '../../libs/checkOut';
 import { AppDataSource } from '../../db/database';
+import {
+  AuthorizationOA,
+  AuthorizationSO,
+  AuthorizationSup,
+} from '../../libs/checkOutAccess';
+
+export const createUser = async (
+  req: Request,
+  res: Response,
+): Promise<Response> => {
+  const {
+    name,
+    lastName,
+    age,
+    email,
+    phoneNumber,
+    userName,
+    password,
+    rol,
+    active,
+  } = req.body;
+
+  try {
+    if (!AuthorizationSup(req, res))
+      return res.status(401).json({
+        message:
+          'You are not authorized to carry out this operation...!',
+      });
+
+    const emailExists = await User.findOne({
+      where: { email: email },
+    });
+    const phoneNumberExists = await User.findOne({
+      where: { phoneNumber: phoneNumber },
+    });
+
+    if (emailExists)
+      return res
+        .status(400)
+        .json(['The email already exists...!']);
+
+    if (phoneNumberExists)
+      return res
+        .status(400)
+        .json(['This Phone number already exists...!']);
+
+    const passwordEncrypted: any = await encrypted(
+      password,
+    );
+
+    const ageString = req.body.age;
+    const ageInt: number = parseInt(ageString, 10);
+
+    const user: UserEntity = new User();
+    user.name = name;
+    user.lastName = lastName;
+    user.age = ageInt;
+    user.email = email;
+    user.phoneNumber = phoneNumber;
+    user.userName = userName;
+    user.password = passwordEncrypted;
+    user.rol = rol || Roles.User;
+    user.active = active || true;
+
+    const newUser = await user.save();
+
+    // Remove password from newUser object
+    const { password: removedPassword, ...userNoPassword } =
+      newUser;
+
+    const userToken = await token(newUser);
+
+    res.cookie('auth-token', userToken);
+
+    return res.status(201).json(userNoPassword);
+  } catch (error) {
+    if (error instanceof Error) {
+      return res.status(500).json({ error: error.message });
+    } else {
+      return res.status(500).json(error);
+    }
+  }
+};
 
 export const getAllUsers = async (
   req: Request,
@@ -24,13 +108,8 @@ export const getAllUsers = async (
     }
 
     // Se verifica el rol del usuario para permitir o no el acceso
-    // única y exclusivamente a 'owner' y 'admin'...
-    if (
-      req.userRole !== 'owner' &&
-      req.userRole !== 'admin'
-    ) {
+    if (!AuthorizationOA(req, res))
       return res.status(403).json('Access denied...!');
-    }
 
     const users = await User.find({
       select: [
@@ -186,7 +265,6 @@ export const updateUser = async (
       .set(newDataUser)
       .where(inputQuery, inputValue)
       .execute();
-    // || 'userName :userName', { userName: userName },
 
     return res.status(200).json({
       message: 'User data updated successfully...!',
@@ -208,18 +286,11 @@ export const deleteUser = async (
   const { email, userName } = req.body;
 
   try {
-    const token: string | any = req.header('auth-token');
-    const userRol = req.userRole;
-    const authUser: User | null = await CheckOutUserOwner(
-      token,
-      userRol,
-    );
-
-    if (!authUser) {
+    if (!AuthorizationSO(req, res))
       return res.status(401).json({
-        message: 'Unauthorized or non-existent user...!',
+        message:
+          'You are not authorized to carry out this operation...!',
       });
-    }
 
     let user: User | any;
     let query: any;

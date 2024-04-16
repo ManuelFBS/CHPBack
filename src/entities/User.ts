@@ -8,13 +8,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Comment } from './Comment';
-
-export enum Roles {
-  SuperAdmin = 'superAdmin',
-  Admin = 'admin',
-  Owner = 'owner',
-  User = 'user',
-}
+import { Roles } from './user.roles';
 
 @Entity()
 export class User extends BaseEntity {

@@ -5,6 +5,7 @@ import {
   deleteArticle,
   getAllArticles,
   getArticleByPartialTitle,
+  getArticlesByCategory,
   updateArticle,
 } from '../controllers/articles/articles.controller';
 
@@ -22,6 +23,13 @@ router.get(
   '/article/:title',
   TokenValidation,
   getArticleByPartialTitle,
+);
+
+// http://localhost:7000/api/users/article/category/:category
+router.get(
+  '/article/category/:category',
+  TokenValidation,
+  getArticlesByCategory,
 );
 // -------------------------------------------------------------------------------------------------- //
 

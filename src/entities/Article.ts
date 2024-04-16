@@ -7,7 +7,6 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { User } from './User';
 import { Comment } from './Comment';
 
 @Entity()
@@ -25,6 +24,12 @@ export class Article extends BaseEntity {
 
   @Column({ type: 'text', nullable: false })
   article: string;
+
+  @Column({
+    default: 'Category...?',
+    nullable: false,
+  })
+  category: string;
 
   @OneToMany(() => Comment, (comment) => comment.article)
   comments: Comment[];

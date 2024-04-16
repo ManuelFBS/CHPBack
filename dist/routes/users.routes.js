@@ -12,5 +12,6 @@ router.delete('/user/delete', verifyToken_1.TokenValidation, users_controller_1.
 // -----------------------------------------------------------------------------------------------------------
 router.get('/articles', verifyToken_1.TokenValidation, articles_controller_1.getAllArticles);
 router.get('/article/:title', verifyToken_1.TokenValidation, articles_controller_1.getArticleByPartialTitle);
+router.get('/article/category/:category', verifyToken_1.TokenValidation, articles_controller_1.getArticlesByCategory);
 exports.default = router;
 //# sourceMappingURL=users.routes.js.map

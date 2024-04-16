@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Request, Response, Router } from 'express';
 import {
   deleteUser,
   getAllUsers,
@@ -8,6 +8,7 @@ import {
 import {
   getAllArticles,
   getArticleByPartialTitle,
+  getArticlesByCategory,
 } from '../controllers/articles/articles.controller';
 import { TokenValidation } from '../validations/tokens/verifyToken';
 
@@ -33,6 +34,12 @@ router.get(
   '/article/:title',
   TokenValidation,
   getArticleByPartialTitle,
+);
+
+router.get(
+  '/article/category/:category',
+  TokenValidation,
+  getArticlesByCategory,
 );
 
 export default router;

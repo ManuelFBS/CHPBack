@@ -20,25 +20,23 @@ var __rest = (this && this.__rest) || function (s, e) {
     return t;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteArticle = exports.updateArticle = exports.getArticleByPartialTitle = exports.getAllArticles = exports.createArticle = void 0;
+exports.deleteArticle = exports.updateArticle = exports.getArticlesByCategory = exports.getArticleByPartialTitle = exports.getAllArticles = exports.createArticle = void 0;
 const Article_1 = require("../../entities/Article");
-const checkOut_1 = require("../../libs/checkOut");
 const typeorm_1 = require("typeorm");
 const database_1 = require("../../db/database");
+const checkOutAccess_1 = require("../../libs/checkOutAccess");
 const createArticle = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const token = req.header('auth-token');
-        const userRol = req.userRole;
-        const authUser = yield (0, checkOut_1.CheckOutUserOwner)(token, userRol);
-        if (!authUser) {
+        // const userRol = req.allUserData.rol;
+        if (!(0, checkOutAccess_1.AuthorizationOw)(req, res))
             return res.status(401).json({
-                message: 'Unauthorized or non-existent user...!',
+                message: 'You are not authorized to carry out this operation...!',
             });
-        }
-        const { title, article, } = req.body;
+        const { title, article, category, } = req.body;
         const newArticle = new Article_1.Article();
         newArticle.title = title;
         newArticle.article = article;
+        newArticle.category = category;
         yield newArticle.save();
         return res
             .status(201)
@@ -57,7 +55,7 @@ exports.createArticle = createArticle;
 const getAllArticles = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const articles = yield Article_1.Article.find({
-            select: ['id', 'title', 'article'],
+            select: ['id', 'title', 'article', 'category'],
         });
         return res.status(200).json(articles);
     }
@@ -106,16 +104,42 @@ const getArticleByPartialTitle = (req, res) => __awaiter(void 0, void 0, void 0,
     }
 });
 exports.getArticleByPartialTitle = getArticleByPartialTitle;
+const getArticlesByCategory = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { category } = req.params;
+        const articles = yield Article_1.Article.find({
+            where: { category },
+        });
+        if (!articles || articles.length === 0)
+            return res
+                .status(404)
+                .json({ message: 'Article not found...' });
+        const formattedArticles = articles.map((article) => (Object.assign(Object.assign({}, article), { createdAt: article.createdAt
+                .toISOString()
+                .split('T')[0], updatedAt: article.updatedAt
+                .toISOString()
+                .split('T')[0] })));
+        return res.status(200).json(formattedArticles);
+    }
+    catch (error) {
+        // console.error(error);
+        if (error instanceof Error) {
+            return res.status(500).json({ error: error.message });
+        }
+        else {
+            return res.status(500).json(error);
+        }
+    }
+});
+exports.getArticlesByCategory = getArticlesByCategory;
 const updateArticle = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // Se autentica al usuario tipo 'owner', quien es el único
         // autozizado para realizar esta operación...
-        const token = req.header('auth-token');
-        const userRol = req.userRole;
-        const authUser = yield (0, checkOut_1.CheckOutUserOwner)(token, userRol);
-        if (!authUser) {
+        const userRol = req.allUserData.rol;
+        if (userRol !== 'owner') {
             return res.status(401).json({
-                message: 'Unauthorized or non-existent user...!',
+                message: 'You are not authorized to carry out this operation...!',
             });
         }
         // -------------------------------------------------------------------------------------------------
@@ -158,12 +182,10 @@ const updateArticle = (req, res) => __awaiter(void 0, void 0, void 0, function* 
 exports.updateArticle = updateArticle;
 const deleteArticle = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const token = req.header('auth-token');
-        const userRol = req.userRole;
-        const authUser = yield (0, checkOut_1.CheckOutUserOwner)(token, userRol);
-        if (!authUser) {
+        const userRol = req.allUserData.rol;
+        if (userRol !== 'owner') {
             return res.status(401).json({
-                message: 'Unauthorized or non-existent user...!',
+                message: 'You are not authorized to carry out this operation...!',
             });
         }
         // -------------------------------------------------------------------------------------------------

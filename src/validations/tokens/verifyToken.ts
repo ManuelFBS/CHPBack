@@ -4,58 +4,35 @@ import jwt, { TokenExpiredError } from 'jsonwebtoken';
 
 dotenv.config();
 
-const invalidatedTokens: string[] = [];
+const SECRET: any = process.env.SECRET_KEY_TOKEN;
 
-export interface IPayload {
-  _id: string;
-  iat: number;
-  exp: number;
-  rol: string;
-}
+// export interface IPayload {
+//   _id: string;
+//   iat: number;
+//   exp: number;
+//   rol: string;
+// }
 
 export const TokenValidation = (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
-  const token = req.header('auth-token');
+  const { 'auth-token': authToken } = req.cookies;
 
-  if (!token)
-    return res.status(401).json('Access denied...!');
+  if (!authToken)
+    return res.status(401).json({
+      message: 'No token, authorization denied...!',
+    });
 
-  try {
-    // Verifica si el token está en la lista de tokens invalidados...
-    if (invalidatedTokens.includes(token)) {
-      return res.status(401).json('Token invalidated...!');
-    }
-
-    const payload = jwt.verify(
-      token,
-      process.env.SECRET_KEY_TOKEN || 'ExtToks112244',
-    ) as IPayload;
-
-    // Check if the token has expired...
-    if (Date.now() >= payload.exp * 1000) {
+  jwt.verify(authToken, SECRET, (err: any, user: any) => {
+    if (err)
       return res
-        .status(401)
-        .json(
-          'Your session has expired. You must log in again...',
-        );
-    }
+        .status(403)
+        .json({ message: 'Invalid token' });
 
-    // req.userId = payload._id;
-    req.userRole = payload.rol;
+    req.allUserData = user;
 
     next();
-  } catch (error) {
-    if (error instanceof TokenExpiredError) {
-      return res
-        .status(401)
-        .json(
-          'Your session has expired. You must log in again...',
-        );
-    } else {
-      return res.status(401).json('Invalid token...!');
-    }
-  }
+  });
 };

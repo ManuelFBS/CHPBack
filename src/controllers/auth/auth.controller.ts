@@ -1,12 +1,15 @@
 import { Request, Response } from 'express';
-import { Roles, User } from '../../entities/User';
+import { User } from '../../entities/User';
+import { Roles } from '../../entities/user.roles';
 import { UserEntity } from '../../interfaces/userEntity';
 import { encrypted } from '../../validations/password/encrypted';
 import { decryptPassword } from '../../validations/password/decrypted';
+import jwt from 'jsonwebtoken';
 import { token } from '../../validations/tokens/token';
 import { isEmailType } from '../../libs/vartype';
+import dotenv from 'dotenv';
 
-const invalidatedTokens: string[] = [];
+dotenv.config();
 
 export const signUp = async (
   req: Request,
@@ -25,14 +28,34 @@ export const signUp = async (
   } = req.body;
 
   try {
+    const emailExists = await User.findOne({
+      where: { email: email },
+    });
+    const phoneNumberExists = await User.findOne({
+      where: { phoneNumber: phoneNumber },
+    });
+
+    if (emailExists)
+      return res
+        .status(400)
+        .json(['The email already exists...!']);
+
+    if (phoneNumberExists)
+      return res
+        .status(400)
+        .json(['This Phone number already exists...!']);
+
     const passwordEncrypted: any = await encrypted(
       password,
     );
 
+    const ageString = req.body.age;
+    const ageInt: number = parseInt(ageString, 10);
+
     const user: UserEntity = new User();
     user.name = name;
     user.lastName = lastName;
-    user.age = age;
+    user.age = ageInt;
     user.email = email;
     user.phoneNumber = phoneNumber;
     user.userName = userName;
@@ -46,10 +69,12 @@ export const signUp = async (
     const { password: removedPassword, ...userNoPassword } =
       newUser;
 
+    const userToken = await token(newUser);
+
+    res.cookie('auth-token', userToken);
+
     // New registered user and token assignment displayed...
-    return res
-      .header('auth-token', token(newUser))
-      .json(userNoPassword);
+    return res.status(201).json(userNoPassword);
   } catch (error) {
     if (error instanceof Error) {
       return res.status(500).json({ error: error.message });
@@ -90,19 +115,18 @@ export const signIn = async (
         .json({ message: 'Invalid password...!' });
     }
 
-    const responseObject = {
-      message: 'Successful login',
-      id: user.id,
-      name: user.name,
-      lastname: user.lastName,
-      email: user.email,
-      phoneNumber: user.phoneNumber,
-      rol: user.rol,
-    };
+    const userToken = await token(user);
 
-    return res
-      .header('auth-token', token(user))
-      .json(responseObject);
+    res.cookie('auth-token', userToken);
+
+    return res.status(200).json({
+      name: user.name,
+      lastName: user.lastName,
+      email: user.email,
+      userName: user.userName,
+      createdAt: user.createdAt.toISOString().split('T')[0],
+      updatedAt: user.updatedAt.toISOString().split('T')[0],
+    });
   } catch (error) {
     if (error instanceof Error) {
       return res.status(500).json({ error: error.message });
@@ -112,26 +136,83 @@ export const signIn = async (
   }
 };
 
-export const signOut = async (
+export const signOut = (req: Request, res: Response) => {
+  res.cookie('auth-token', '', {
+    expires: new Date(0),
+  });
+
+  return res.sendStatus(200);
+};
+
+export const profile = async (
   req: Request,
   res: Response,
 ): Promise<Response> => {
-  try {
-    // Obtener el token de la solicitud...
-    const token = req.header('auth-token');
+  const id = req.allUserData._id;
+  const userFound = await User.findOne({ where: { id } });
 
-    if (!token)
-      return res.status(401).json('Access denied...!');
+  if (!userFound)
+    return res
+      .status(400)
+      .json({ message: 'User not found...!' });
 
-    // Invalidar el token, añadiéndolo a la lista negra...
-    invalidatedTokens.push(token);
+  return res.json({
+    id: userFound.id,
+    name: userFound.name,
+    lastName: userFound.lastName,
+    age: userFound.age,
+    email: userFound.email,
+    phoneNumber: userFound.phoneNumber,
+    username: userFound.userName,
+    createdAt: userFound.createdAt
+      .toISOString()
+      .split('T')[0],
+    updatedAt: userFound.updatedAt
+      .toISOString()
+      .split('T')[0],
+  });
+};
 
-    return res.json({ message: 'Logout successful !' });
-  } catch (error) {
-    if (error instanceof Error) {
-      return res.status(500).json({ error: error.message });
-    } else {
-      return res.status(500).json(error);
-    }
-  }
+export const frontVerifyToken = async (
+  req: Request,
+  res: Response,
+): Promise<Response> => {
+  const authToken = req.cookies['auth-token'];
+  const role: boolean = false;
+
+  if (!authToken)
+    return res
+      .status(401)
+      .json({ message: 'Unauthorized' });
+
+  jwt.verify(
+    authToken,
+    process.env.SECRET_KEY_TOKEN || 'ExtToks#JH450&0021RTD',
+    async (err: any, user: any) => {
+      if (err)
+        return res
+          .status(401)
+          .json({ message: 'Unauthorized' });
+    },
+  );
+
+  const userFound = await User.findOne({
+    where: { id: parseInt(req.userId) },
+  });
+
+  if (!userFound)
+    return res
+      .status(401)
+      .json({ message: 'Unauthorized' });
+
+  return res.json([
+    authToken,
+    {
+      id: userFound.id,
+      name: userFound.name,
+      lastName: userFound.lastName,
+      email: userFound.email,
+      rol: userFound.rol,
+    },
+  ]);
 };

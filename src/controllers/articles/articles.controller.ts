@@ -1,37 +1,37 @@
 import { Request, Response } from 'express';
 import { Article } from '../../entities/Article';
-import { User } from '../../entities/User';
-import { CheckOutUserOwner } from '../../libs/checkOut';
 import { Raw } from 'typeorm';
 import { ArticleEntity } from '../../interfaces/articleEntity';
 import { AppDataSource } from '../../db/database';
+import { AuthorizationOw } from '../../libs/checkOutAccess';
 
 export const createArticle = async (
   req: Request,
   res: Response,
 ): Promise<Response> => {
   try {
-    const token: string | any = req.header('auth-token');
-    const userRol = req.userRole;
-    const authUser: User | null = await CheckOutUserOwner(
-      token,
-      userRol,
-    );
+    // const userRol = req.allUserData.rol;
 
-    if (!authUser) {
+    if (!AuthorizationOw(req, res))
       return res.status(401).json({
-        message: 'Unauthorized or non-existent user...!',
+        message:
+          'You are not authorized to carry out this operation...!',
       });
-    }
 
     const {
       title,
       article,
-    }: { title: string; article: string } = req.body;
+      category,
+    }: {
+      title: string;
+      article: string;
+      category: string;
+    } = req.body;
 
     const newArticle = new Article();
     newArticle.title = title;
     newArticle.article = article;
+    newArticle.category = category;
 
     await newArticle.save();
 
@@ -53,7 +53,7 @@ export const getAllArticles = async (
 ): Promise<Response> => {
   try {
     const articles = await Article.find({
-      select: ['id', 'title', 'article'],
+      select: ['id', 'title', 'article', 'category'],
     });
 
     return res.status(200).json(articles);
@@ -117,6 +117,43 @@ export const getArticleByPartialTitle = async (
   }
 };
 
+export const getArticlesByCategory = async (
+  req: Request,
+  res: Response,
+): Promise<Response> => {
+  try {
+    const { category } = req.params;
+
+    const articles = await Article.find({
+      where: { category },
+    });
+
+    if (!articles || articles.length === 0)
+      return res
+        .status(404)
+        .json({ message: 'Article not found...' });
+
+    const formattedArticles = articles.map((article) => ({
+      ...article,
+      createdAt: article.createdAt
+        .toISOString()
+        .split('T')[0],
+      updatedAt: article.updatedAt
+        .toISOString()
+        .split('T')[0],
+    }));
+
+    return res.status(200).json(formattedArticles);
+  } catch (error) {
+    // console.error(error);
+    if (error instanceof Error) {
+      return res.status(500).json({ error: error.message });
+    } else {
+      return res.status(500).json(error);
+    }
+  }
+};
+
 export const updateArticle = async (
   req: Request,
   res: Response,
@@ -124,16 +161,12 @@ export const updateArticle = async (
   try {
     // Se autentica al usuario tipo 'owner', quien es el único
     // autozizado para realizar esta operación...
-    const token: string | any = req.header('auth-token');
-    const userRol = req.userRole;
-    const authUser: User | null = await CheckOutUserOwner(
-      token,
-      userRol,
-    );
+    const userRol = req.allUserData.rol;
 
-    if (!authUser) {
+    if (userRol !== 'owner') {
       return res.status(401).json({
-        message: 'Unauthorized or non-existent user...!',
+        message:
+          'You are not authorized to carry out this operation...!',
       });
     }
     // -------------------------------------------------------------------------------------------------
@@ -184,16 +217,12 @@ export const deleteArticle = async (
   res: Response,
 ): Promise<Response> => {
   try {
-    const token: string | any = req.header('auth-token');
-    const userRol = req.userRole;
-    const authUser: User | null = await CheckOutUserOwner(
-      token,
-      userRol,
-    );
+    const userRol = req.allUserData.rol;
 
-    if (!authUser) {
+    if (userRol !== 'owner') {
       return res.status(401).json({
-        message: 'Unauthorized or non-existent user...!',
+        message:
+          'You are not authorized to carry out this operation...!',
       });
     }
     // -------------------------------------------------------------------------------------------------
