@@ -185,12 +185,13 @@ export const updateArticle = async (
     }
     // -------------------------------------------------------------------------------------------------
 
-    const { title, article } = req.body;
+    const { title, article, category } = req.body;
 
     const dataSource = AppDataSource;
     const data: Article[] | any = {
       title: title,
       article: article,
+      category: category,
     };
 
     dataSource

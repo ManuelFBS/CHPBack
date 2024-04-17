@@ -154,11 +154,12 @@ const updateArticle = (req, res) => __awaiter(void 0, void 0, void 0, function* 
                 .json({ message: 'Article not found...' });
         }
         // -------------------------------------------------------------------------------------------------
-        const { title, article } = req.body;
+        const { title, article, category } = req.body;
         const dataSource = database_1.AppDataSource;
         const data = {
             title: title,
             article: article,
+            category: category,
         };
         dataSource
             .createQueryBuilder()
