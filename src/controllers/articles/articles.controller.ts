@@ -74,35 +74,54 @@ export const getArticleByPartialTitle = async (
 
   if (!partialTitle) {
     return res
-      .status(401)
+      .status(400)
       .json({ message: 'You must provide a title...' });
   }
 
   try {
-    const articleFound: ArticleEntity[] =
-      await Article.find({
-        where: {
-          title: Raw(
-            (alias) =>
-              `LOWER(${alias}) LIKE LOWER('%${partialTitle}%')`,
-          ),
-        },
-      });
+    const article = await Article.createQueryBuilder(
+      'article',
+    )
+      .leftJoinAndSelect('article.comments', 'comment')
+      .leftJoinAndSelect('comment.user', 'user')
+      .where(
+        'LOWER(article.title) LIKE LOWER(:partialTitle)',
+        { partialTitle: `%${partialTitle}%` },
+      )
+      .getOne();
 
-    if (!articleFound)
+    if (!article) {
       return res
         .status(404)
         .json({ message: 'Article not found...' });
+    }
+
+    article.comments = article.comments.map(
+      (comment: any) => ({
+        ...comment,
+        createdAt: comment.createdAt
+          .toISOString()
+          .split('T')[0],
+        updatedAt: comment.updatedAt
+          .toISOString()
+          .split('T')[0],
+        user: {
+          name: comment.user.name,
+          lastName: comment.user.lastName,
+          email: comment.user.email,
+        },
+      }),
+    );
 
     const { createdAt, updatedAt, ...articleTemp } =
-      articleFound[0];
+      article;
 
     const formattedArticle = {
       ...articleTemp,
-      createdAt: articleFound[0].createdAt
+      createdAt: article.createdAt
         .toISOString()
         .split('T')[0],
-      udatedAt: articleFound[0].updatedAt
+      udatedAt: article.updatedAt
         .toISOString()
         .split('T')[0],
     };

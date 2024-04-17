@@ -22,7 +22,6 @@ var __rest = (this && this.__rest) || function (s, e) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteArticle = exports.updateArticle = exports.getArticlesByCategory = exports.getArticleByPartialTitle = exports.getAllArticles = exports.createArticle = void 0;
 const Article_1 = require("../../entities/Article");
-const typeorm_1 = require("typeorm");
 const database_1 = require("../../db/database");
 const checkOutAccess_1 = require("../../libs/checkOutAccess");
 const createArticle = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -73,23 +72,33 @@ const getArticleByPartialTitle = (req, res) => __awaiter(void 0, void 0, void 0,
     const partialTitle = req.params.title;
     if (!partialTitle) {
         return res
-            .status(401)
+            .status(400)
             .json({ message: 'You must provide a title...' });
     }
     try {
-        const articleFound = yield Article_1.Article.find({
-            where: {
-                title: (0, typeorm_1.Raw)((alias) => `LOWER(${alias}) LIKE LOWER('%${partialTitle}%')`),
-            },
-        });
-        if (!articleFound)
+        const article = yield Article_1.Article.createQueryBuilder('article')
+            .leftJoinAndSelect('article.comments', 'comment')
+            .leftJoinAndSelect('comment.user', 'user')
+            .where('LOWER(article.title) LIKE LOWER(:partialTitle)', { partialTitle: `%${partialTitle}%` })
+            .getOne();
+        if (!article) {
             return res
                 .status(404)
                 .json({ message: 'Article not found...' });
-        const _a = articleFound[0], { createdAt, updatedAt } = _a, articleTemp = __rest(_a, ["createdAt", "updatedAt"]);
-        const formattedArticle = Object.assign(Object.assign({}, articleTemp), { createdAt: articleFound[0].createdAt
+        }
+        article.comments = article.comments.map((comment) => (Object.assign(Object.assign({}, comment), { createdAt: comment.createdAt
                 .toISOString()
-                .split('T')[0], udatedAt: articleFound[0].updatedAt
+                .split('T')[0], updatedAt: comment.updatedAt
+                .toISOString()
+                .split('T')[0], user: {
+                name: comment.user.name,
+                lastName: comment.user.lastName,
+                email: comment.user.email,
+            } })));
+        const { createdAt, updatedAt } = article, articleTemp = __rest(article, ["createdAt", "updatedAt"]);
+        const formattedArticle = Object.assign(Object.assign({}, articleTemp), { createdAt: article.createdAt
+                .toISOString()
+                .split('T')[0], udatedAt: article.updatedAt
                 .toISOString()
                 .split('T')[0] });
         return res.status(200).json(formattedArticle);

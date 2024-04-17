@@ -10,6 +10,7 @@ import {
   getArticleByPartialTitle,
   getArticlesByCategory,
 } from '../controllers/articles/articles.controller';
+import { createNewComment } from '../controllers/comments/comments.controller';
 import { TokenValidation } from '../validations/tokens/verifyToken';
 
 const router: Router = Router();
@@ -40,6 +41,14 @@ router.get(
   '/article/category/:category',
   TokenValidation,
   getArticlesByCategory,
+);
+
+// -----------------------------------------------------------------------------------------------------------
+
+router.post(
+  '/user/article/comment/new',
+  TokenValidation,
+  createNewComment,
 );
 
 export default router;

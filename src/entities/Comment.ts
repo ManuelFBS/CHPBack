@@ -22,7 +22,7 @@ export class Comment extends BaseEntity {
   user: User;
 
   @ManyToOne(() => Article, (article) => article.comments)
-  article: Article[];
+  article: Article;
 
   @CreateDateColumn()
   createdAt: Date;

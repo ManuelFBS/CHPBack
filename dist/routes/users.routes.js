@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const users_controller_1 = require("../controllers/users/users.controller");
 const articles_controller_1 = require("../controllers/articles/articles.controller");
+const comments_controller_1 = require("../controllers/comments/comments.controller");
 const verifyToken_1 = require("../validations/tokens/verifyToken");
 const router = (0, express_1.Router)();
 router.get('/', verifyToken_1.TokenValidation, users_controller_1.getAllUsers);
@@ -13,5 +14,7 @@ router.delete('/user/delete', verifyToken_1.TokenValidation, users_controller_1.
 router.get('/articles', verifyToken_1.TokenValidation, articles_controller_1.getAllArticles);
 router.get('/article/:title', verifyToken_1.TokenValidation, articles_controller_1.getArticleByPartialTitle);
 router.get('/article/category/:category', verifyToken_1.TokenValidation, articles_controller_1.getArticlesByCategory);
+// -----------------------------------------------------------------------------------------------------------
+router.post('/user/article/comment/new', verifyToken_1.TokenValidation, comments_controller_1.createNewComment);
 exports.default = router;
 //# sourceMappingURL=users.routes.js.map

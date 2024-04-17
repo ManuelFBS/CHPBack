@@ -23,15 +23,4 @@ export const token = (savedUser: UserEntity) => {
       },
     );
   });
-  // return new Promise((resolve, reject) => {
-  //   jwt.sign(
-  //     payload,
-  //     process.env.SECRET_KEY_TOKEN || 'ExtToks112244',
-  //     { expiresIn: '2d' },
-  //     (err, token) => {
-  //       if (err) reject(err);
-  //       resolve(token);
-  //     },
-  //   );
-  // });
 };

@@ -30,7 +30,7 @@ __decorate([
 ], Comment.prototype, "user", void 0);
 __decorate([
     (0, typeorm_1.ManyToOne)(() => Article_1.Article, (article) => article.comments),
-    __metadata("design:type", Array)
+    __metadata("design:type", Article_1.Article)
 ], Comment.prototype, "article", void 0);
 __decorate([
     (0, typeorm_1.CreateDateColumn)(),
