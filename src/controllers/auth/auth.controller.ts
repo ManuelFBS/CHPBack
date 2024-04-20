@@ -106,10 +106,11 @@ export const signIn = async (
       });
     }
 
-    if (!user)
+    if (!user) {
       return res
         .status(404)
         .json({ message: 'User not found...!' });
+    }
 
     if (!(await decryptPassword(password, user.password))) {
       return res
