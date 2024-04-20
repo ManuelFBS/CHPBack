@@ -7,7 +7,10 @@ import {
   profile,
 } from '../controllers/auth/auth.controller';
 import { SchemaValidation } from '../middlewares/schemaValidator.middleware';
-import { SignUpSchema } from '../schemas/auth.schema';
+import {
+  SignInSchema,
+  SignUpSchema,
+} from '../schemas/auth.schema';
 import { TokenValidation } from '../validations/tokens/verifyToken';
 
 const router: Router = Router();
@@ -18,7 +21,11 @@ router.post(
   signUp,
 );
 
-router.post('/signin', signIn);
+router.post(
+  '/signin',
+  SchemaValidation(SignInSchema),
+  signIn,
+);
 
 router.post('/signout', signOut);
 
