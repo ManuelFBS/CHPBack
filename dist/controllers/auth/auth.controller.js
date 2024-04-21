@@ -171,29 +171,27 @@ const frontVerifyToken = (req, res) => __awaiter(void 0, void 0, void 0, functio
         return res
             .status(401)
             .json({ message: 'Unauthorized' });
-    let userVerified;
     jsonwebtoken_1.default.verify(authToken, process.env.SECRET_KEY_TOKEN || SECRET_AUX, (err, user) => __awaiter(void 0, void 0, void 0, function* () {
         if (err)
             return res
                 .status(401)
                 .json({ message: 'Unauthorized' });
-        const userFound = yield User_1.User.findOne({
-            where: { id: parseInt(user.id) },
-        });
-        if (!userFound)
-            return res
-                .status(401)
-                .json({ message: 'Unauthorized' });
-        userVerified = user;
     }));
+    const userFound = yield User_1.User.findOne({
+        where: { id: parseInt(req.userId) },
+    });
+    if (!userFound)
+        return res
+            .status(401)
+            .json({ message: 'Unauthorized' });
     return res.json([
         authToken,
         {
-            id: userVerified.id,
-            name: userVerified.name,
-            lastName: userVerified.lastName,
-            email: userVerified.email,
-            rol: userVerified.rol,
+            id: userFound.id,
+            name: userFound.name,
+            lastName: userFound.lastName,
+            email: userFound.email,
+            rol: userFound.rol,
         },
     ]);
 });

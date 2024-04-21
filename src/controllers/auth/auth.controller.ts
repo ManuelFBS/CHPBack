@@ -196,7 +196,6 @@ export const frontVerifyToken = async (
       .status(401)
       .json({ message: 'Unauthorized' });
 
-  let userVerified: any;
   jwt.verify(
     authToken,
     process.env.SECRET_KEY_TOKEN || SECRET_AUX,
@@ -205,28 +204,26 @@ export const frontVerifyToken = async (
         return res
           .status(401)
           .json({ message: 'Unauthorized' });
-
-      const userFound = await User.findOne({
-        where: { id: parseInt(user.id) },
-      });
-
-      if (!userFound)
-        return res
-          .status(401)
-          .json({ message: 'Unauthorized' });
-
-      userVerified = user;
     },
   );
+
+  const userFound = await User.findOne({
+    where: { id: parseInt(req.userId) },
+  });
+
+  if (!userFound)
+    return res
+      .status(401)
+      .json({ message: 'Unauthorized' });
 
   return res.json([
     authToken,
     {
-      id: userVerified.id,
-      name: userVerified.name,
-      lastName: userVerified.lastName,
-      email: userVerified.email,
-      rol: userVerified.rol,
+      id: userFound.id,
+      name: userFound.name,
+      lastName: userFound.lastName,
+      email: userFound.email,
+      rol: userFound.rol,
     },
   ]);
 };
