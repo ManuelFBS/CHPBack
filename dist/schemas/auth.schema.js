@@ -67,7 +67,7 @@ exports.SignUpSchema = zod_1.z.object({
         password: zod_1.z
             .string({
             required_error: 'Password is required...',
-            invalid_type_error: 'The email must be a string...',
+            invalid_type_error: 'The password must be a string...',
         })
             .min(6, {
             message: 'Password must be a minimum of 6 characters',
@@ -79,5 +79,27 @@ exports.SignUpSchema = zod_1.z.object({
         active: zod_1.z.boolean().optional(),
     }),
 });
-exports.SignInSchema = zod_1.z.object({});
+exports.SignInSchema = zod_1.z.object({
+    body: zod_1.z.object({
+        inputValue: zod_1.z
+            .string({
+            required_error: 'User name or email is required...',
+            invalid_type_error: 'User name: must be a string / Email: must be a valid format...',
+        })
+            .min(5, {
+            message: 'User name: min 5 chars / Email: a valid format...',
+        }),
+        password: zod_1.z
+            .string({
+            required_error: 'Password is required...',
+            invalid_type_error: 'The password must be a string...',
+        })
+            .min(6, {
+            message: 'Password must be a minimum of 6 characters',
+        })
+            .max(20, {
+            message: 'Password must be a maximum of 20 characters',
+        }),
+    }),
+});
 //# sourceMappingURL=auth.schema.js.map

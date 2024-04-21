@@ -29,8 +29,8 @@ router.post(
 
 router.post('/signout', signOut);
 
-router.get('/profile', TokenValidation, profile);
-
 router.get('/verify', frontVerifyToken);
+
+router.get('/profile', TokenValidation, profile);
 
 export default router;

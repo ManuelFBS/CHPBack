@@ -33,6 +33,7 @@ const token_1 = require("../../validations/tokens/token");
 const vartype_1 = require("../../libs/vartype");
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
+const SECRET_AUX = process.env.SECRET_KEY_AUX;
 const signUp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { name, lastName, age, email, phoneNumber, userName, password, rol, active, } = req.body;
     try {
@@ -67,7 +68,10 @@ const signUp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         // Remove password from newUser object
         const { password: removedPassword } = newUser, userNoPassword = __rest(newUser, ["password"]);
         const userToken = yield (0, token_1.token)(newUser);
-        res.cookie('auth-token', userToken);
+        res.cookie('auth-token', userToken, {
+            sameSite: 'none',
+            secure: true,
+        });
         // New registered user and token assignment displayed...
         return res.status(201).json(userNoPassword);
     }
@@ -95,15 +99,21 @@ const signIn = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 where: { userName: inputValue },
             });
         }
-        if (!user)
-            return res.status(404).json('User not found...!');
+        if (!user) {
+            return res
+                .status(404)
+                .json({ message: 'User not found...!' });
+        }
         if (!(yield (0, decrypted_1.decryptPassword)(password, user.password))) {
             return res
                 .status(401)
                 .json({ message: 'Invalid password...!' });
         }
         const userToken = yield (0, token_1.token)(user);
-        res.cookie('auth-token', userToken);
+        res.cookie('auth-token', userToken, {
+            sameSite: 'none',
+            secure: true,
+        });
         return res.status(200).json({
             name: user.name,
             lastName: user.lastName,
@@ -161,29 +171,58 @@ const frontVerifyToken = (req, res) => __awaiter(void 0, void 0, void 0, functio
         return res
             .status(401)
             .json({ message: 'Unauthorized' });
-    jsonwebtoken_1.default.verify(authToken, process.env.SECRET_KEY_TOKEN || 'ExtToks#JH450&0021RTD', (err, user) => __awaiter(void 0, void 0, void 0, function* () {
+    let userVerified;
+    jsonwebtoken_1.default.verify(authToken, process.env.SECRET_KEY_TOKEN || SECRET_AUX, (err, user) => __awaiter(void 0, void 0, void 0, function* () {
         if (err)
             return res
                 .status(401)
                 .json({ message: 'Unauthorized' });
+        const userFound = yield User_1.User.findOne({
+            where: { id: parseInt(user.id) },
+        });
+        if (!userFound)
+            return res
+                .status(401)
+                .json({ message: 'Unauthorized' });
+        userVerified = user;
     }));
-    const userFound = yield User_1.User.findOne({
-        where: { id: parseInt(req.userId) },
-    });
-    if (!userFound)
-        return res
-            .status(401)
-            .json({ message: 'Unauthorized' });
     return res.json([
         authToken,
         {
-            id: userFound.id,
-            name: userFound.name,
-            lastName: userFound.lastName,
-            email: userFound.email,
-            rol: userFound.rol,
+            id: userVerified.id,
+            name: userVerified.name,
+            lastName: userVerified.lastName,
+            email: userVerified.email,
+            rol: userVerified.rol,
         },
     ]);
+    // jwt.verify(
+    //   authToken,
+    //   process.env.SECRET_KEY_TOKEN || SECRET_AUX,
+    //   async (err: any, user: any) => {
+    //     if (err)
+    //       return res
+    //         .status(401)
+    //         .json({ message: 'Unauthorized' });
+    //   },
+    // );
+    // const userFound = await User.findOne({
+    //   where: { id: parseInt(req.userId) },
+    // });
+    // if (!userFound)
+    //   return res
+    //     .status(401)
+    //     .json({ message: 'Unauthorized' });
+    // return res.json([
+    //   authToken,
+    //   {
+    //     id: userFound.id,
+    //     name: userFound.name,
+    //     lastName: userFound.lastName,
+    //     email: userFound.email,
+    //     rol: userFound.rol,
+    //   },
+    // ]);
 });
 exports.frontVerifyToken = frontVerifyToken;
 //# sourceMappingURL=auth.controller.js.map
