@@ -10,8 +10,8 @@ import { isEmailType } from '../../libs/vartype';
 import dotenv from 'dotenv';
 
 dotenv.config();
-
-const SECRET_AUX: any = process.env.SECRET_KEY_AUX;
+const SKT: any = process.env.SECRET_KEY_TOKEN;
+const SAX: any = process.env.SECRET_KEY_AUX;
 
 export const signUp = async (
   req: Request,
@@ -187,7 +187,7 @@ export const profile = async (
 export const frontVerifyToken = async (
   req: Request,
   res: Response,
-): Promise<Response> => {
+) => {
   const authToken = req.cookies['auth-token'];
   const role: boolean = false;
 
@@ -198,32 +198,65 @@ export const frontVerifyToken = async (
 
   jwt.verify(
     authToken,
-    process.env.SECRET_KEY_TOKEN || SECRET_AUX,
+    SKT || SAX,
     async (err: any, user: any) => {
       if (err)
         return res
           .status(401)
           .json({ message: 'Unauthorized' });
+
+      const userFound = await User.findOne({
+        where: { id: user.id },
+      });
+
+      if (!userFound)
+        return res
+          .status(401)
+          .json({ message: 'Unauthorized' });
+
+      return res.json({
+        id: userFound.id,
+        name: userFound.name,
+        lastName: userFound.lastName,
+        email: userFound.email,
+        rol: userFound.rol,
+      });
     },
   );
 
-  const userFound = await User.findOne({
-    where: { id: parseInt(req.userId) },
-  });
+  // if (!authToken)
+  //   return res
+  //     .status(401)
+  //     .json({ message: 'Unauthorized' });
 
-  if (!userFound)
-    return res
-      .status(401)
-      .json({ message: 'Unauthorized' });
+  // jwt.verify(
+  //   authToken,
+  //   process.env.SECRET_KEY_TOKEN || 'ExtToks#JH450&0021RTD',
+  //   async (err: any, user: any) => {
+  //     if (err)
+  //       return res
+  //         .status(401)
+  //         .json({ message: 'Unauthorized' });
+  //   },
+  // );
 
-  return res.json([
-    authToken,
-    {
-      id: userFound.id,
-      name: userFound.name,
-      lastName: userFound.lastName,
-      email: userFound.email,
-      rol: userFound.rol,
-    },
-  ]);
+  // const userFound = await User.findOne({
+  //   where: { id: parseInt(req.userId) },
+  // });
+
+  // if (!userFound)
+  //   return res
+  //     .status(401)
+  //     .json({ message: 'Unauthorized' });
+
+  // return res.json([
+  //   authToken,
+  //   {
+  //     id: userFound.id,
+  //     name: userFound.name,
+  //     lastName: userFound.lastName,
+  //     email: userFound.email,
+  //     rol: userFound.rol,
+  //   },
+  // ]);
 };
