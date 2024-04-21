@@ -71,7 +71,9 @@ export const signUp = async (
 
     const userToken = await token(newUser);
 
-    res.cookie('auth-token', userToken);
+    res.cookie('auth-token', userToken, {
+      sameSite: 'none',
+    });
 
     // New registered user and token assignment displayed...
     return res.status(201).json(userNoPassword);
@@ -120,7 +122,9 @@ export const signIn = async (
 
     const userToken = await token(user);
 
-    res.cookie('auth-token', userToken);
+    res.cookie('auth-token', userToken, {
+      sameSite: 'none',
+    });
 
     return res.status(200).json({
       name: user.name,
