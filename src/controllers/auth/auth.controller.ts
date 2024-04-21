@@ -73,6 +73,7 @@ export const signUp = async (
 
     res.cookie('auth-token', userToken, {
       sameSite: 'none',
+      secure: true,
     });
 
     // New registered user and token assignment displayed...
@@ -124,6 +125,7 @@ export const signIn = async (
 
     res.cookie('auth-token', userToken, {
       sameSite: 'none',
+      secure: true,
     });
 
     return res.status(200).json({
