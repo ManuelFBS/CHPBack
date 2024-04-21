@@ -196,33 +196,6 @@ const frontVerifyToken = (req, res) => __awaiter(void 0, void 0, void 0, functio
             rol: userVerified.rol,
         },
     ]);
-    // jwt.verify(
-    //   authToken,
-    //   process.env.SECRET_KEY_TOKEN || SECRET_AUX,
-    //   async (err: any, user: any) => {
-    //     if (err)
-    //       return res
-    //         .status(401)
-    //         .json({ message: 'Unauthorized' });
-    //   },
-    // );
-    // const userFound = await User.findOne({
-    //   where: { id: parseInt(req.userId) },
-    // });
-    // if (!userFound)
-    //   return res
-    //     .status(401)
-    //     .json({ message: 'Unauthorized' });
-    // return res.json([
-    //   authToken,
-    //   {
-    //     id: userFound.id,
-    //     name: userFound.name,
-    //     lastName: userFound.lastName,
-    //     email: userFound.email,
-    //     rol: userFound.rol,
-    //   },
-    // ]);
 });
 exports.frontVerifyToken = frontVerifyToken;
 //# sourceMappingURL=auth.controller.js.map
