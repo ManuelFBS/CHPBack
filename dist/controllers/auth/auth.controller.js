@@ -120,6 +120,7 @@ const signIn = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             lastName: user.lastName,
             email: user.email,
             userName: user.userName,
+            rol: user.rol,
             createdAt: user.createdAt.toISOString().split('T')[0],
             updatedAt: user.updatedAt.toISOString().split('T')[0],
         });

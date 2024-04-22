@@ -135,6 +135,7 @@ export const signIn = async (
       lastName: user.lastName,
       email: user.email,
       userName: user.userName,
+      rol: user.rol,
       createdAt: user.createdAt.toISOString().split('T')[0],
       updatedAt: user.updatedAt.toISOString().split('T')[0],
     });
