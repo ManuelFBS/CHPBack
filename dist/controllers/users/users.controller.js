@@ -104,6 +104,8 @@ const getAllUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
                 'userName',
                 'rol',
                 'active',
+                'createdAt',
+                'updatedAt',
             ],
             order: orderOptions,
         });

@@ -122,6 +122,8 @@ export const getAllUsers = async (
         'userName',
         'rol',
         'active',
+        'createdAt',
+        'updatedAt',
       ],
       order: orderOptions,
     });
