@@ -136,6 +136,38 @@ export const getArticleByPartialTitle = async (
   }
 };
 
+export const getArticleByID = async (
+  req: Request,
+  res: Response,
+): Promise<Response> => {
+  const id: number = parseInt(req.params.id);
+
+  if (!id) {
+    return res
+      .status(400)
+      .json({ message: 'You must provide a id...' });
+  }
+
+  try {
+    const article = await Article.findOne({
+      where: { id },
+    });
+
+    if (!article)
+      return res
+        .status(404)
+        .json({ message: 'Article not found' });
+
+    return res.status(200).json(article);
+  } catch (error) {
+    if (error instanceof Error) {
+      return res.status(500).json({ error: error.message });
+    } else {
+      return res.status(500).json(error);
+    }
+  }
+};
+
 export const getArticlesByCategory = async (
   req: Request,
   res: Response,

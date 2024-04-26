@@ -20,7 +20,7 @@ var __rest = (this && this.__rest) || function (s, e) {
     return t;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteArticle = exports.updateArticle = exports.getArticlesByCategory = exports.getArticleByPartialTitle = exports.getAllArticles = exports.createArticle = void 0;
+exports.deleteArticle = exports.updateArticle = exports.getArticlesByCategory = exports.getArticleByID = exports.getArticleByPartialTitle = exports.getAllArticles = exports.createArticle = void 0;
 const Article_1 = require("../../entities/Article");
 const database_1 = require("../../db/database");
 const checkOutAccess_1 = require("../../libs/checkOutAccess");
@@ -113,6 +113,33 @@ const getArticleByPartialTitle = (req, res) => __awaiter(void 0, void 0, void 0,
     }
 });
 exports.getArticleByPartialTitle = getArticleByPartialTitle;
+const getArticleByID = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = parseInt(req.params.id);
+    if (!id) {
+        return res
+            .status(400)
+            .json({ message: 'You must provide a id...' });
+    }
+    try {
+        const article = yield Article_1.Article.findOne({
+            where: { id },
+        });
+        if (!article)
+            return res
+                .status(404)
+                .json({ message: 'Article not found' });
+        return res.status(200).json(article);
+    }
+    catch (error) {
+        if (error instanceof Error) {
+            return res.status(500).json({ error: error.message });
+        }
+        else {
+            return res.status(500).json(error);
+        }
+    }
+});
+exports.getArticleByID = getArticleByID;
 const getArticlesByCategory = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { category } = req.params;
