@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { Article } from '../../entities/Article';
-import { Raw } from 'typeorm';
-import { ArticleEntity } from '../../interfaces/articleEntity';
+// import { Raw } from 'typeorm';
+// import { ArticleEntity } from '../../interfaces/articleEntity';
 import { AppDataSource } from '../../db/database';
 import { AuthorizationOw } from '../../libs/checkOutAccess';
 
@@ -149,16 +149,50 @@ export const getArticleByID = async (
   }
 
   try {
-    const article = await Article.findOne({
-      where: { id },
-    });
+    const article = await Article.createQueryBuilder(
+      'article',
+    )
+      .leftJoinAndSelect('article.comments', 'comment')
+      .leftJoinAndSelect('comment.user', 'user')
+      .where({ id })
+      .getOne();
 
     if (!article)
       return res
         .status(404)
-        .json({ message: 'Article not found' });
+        .json({ message: 'Article not found...' });
 
-    return res.status(200).json(article);
+    article.comments = article.comments.map(
+      (comment: any) => ({
+        ...comment,
+        createdAt: comment.createdAt
+          .toISOString()
+          .split('T')[0],
+        updatedAt: comment.updatedAt
+          .toISOString()
+          .split('T')[0],
+        user: {
+          name: comment.user.name,
+          lastName: comment.user.lastName,
+          email: comment.user.email,
+        },
+      }),
+    );
+
+    const { createdAt, updatedAt, ...articleTemp } =
+      article;
+
+    const formattedObject = {
+      ...articleTemp,
+      createdAt: article.createdAt
+        .toISOString()
+        .split('T')[0],
+      updatedAt: article.updatedAt
+        .toISOString()
+        .split('T')[0],
+    };
+
+    return res.status(200).json(formattedObject);
   } catch (error) {
     if (error instanceof Error) {
       return res.status(500).json({ error: error.message });

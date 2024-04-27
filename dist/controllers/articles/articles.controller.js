@@ -22,6 +22,8 @@ var __rest = (this && this.__rest) || function (s, e) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteArticle = exports.updateArticle = exports.getArticlesByCategory = exports.getArticleByID = exports.getArticleByPartialTitle = exports.getAllArticles = exports.createArticle = void 0;
 const Article_1 = require("../../entities/Article");
+// import { Raw } from 'typeorm';
+// import { ArticleEntity } from '../../interfaces/articleEntity';
 const database_1 = require("../../db/database");
 const checkOutAccess_1 = require("../../libs/checkOutAccess");
 const createArticle = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -121,14 +123,31 @@ const getArticleByID = (req, res) => __awaiter(void 0, void 0, void 0, function*
             .json({ message: 'You must provide a id...' });
     }
     try {
-        const article = yield Article_1.Article.findOne({
-            where: { id },
-        });
+        const article = yield Article_1.Article.createQueryBuilder('article')
+            .leftJoinAndSelect('article.comments', 'comment')
+            .leftJoinAndSelect('comment.user', 'user')
+            .where({ id })
+            .getOne();
         if (!article)
             return res
                 .status(404)
-                .json({ message: 'Article not found' });
-        return res.status(200).json(article);
+                .json({ message: 'Article not found...' });
+        article.comments = article.comments.map((comment) => (Object.assign(Object.assign({}, comment), { createdAt: comment.createdAt
+                .toISOString()
+                .split('T')[0], updatedAt: comment.updatedAt
+                .toISOString()
+                .split('T')[0], user: {
+                name: comment.user.name,
+                lastName: comment.user.lastName,
+                email: comment.user.email,
+            } })));
+        const { createdAt, updatedAt } = article, articleTemp = __rest(article, ["createdAt", "updatedAt"]);
+        const formattedObject = Object.assign(Object.assign({}, articleTemp), { createdAt: article.createdAt
+                .toISOString()
+                .split('T')[0], updatedAt: article.updatedAt
+                .toISOString()
+                .split('T')[0] });
+        return res.status(200).json(formattedObject);
     }
     catch (error) {
         if (error instanceof Error) {
