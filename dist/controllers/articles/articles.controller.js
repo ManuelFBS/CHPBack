@@ -22,8 +22,6 @@ var __rest = (this && this.__rest) || function (s, e) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteArticle = exports.updateArticle = exports.getArticlesByCategory = exports.getArticleByID = exports.getArticleByPartialTitle = exports.getAllArticles = exports.createArticle = void 0;
 const Article_1 = require("../../entities/Article");
-// import { Raw } from 'typeorm';
-// import { ArticleEntity } from '../../interfaces/articleEntity';
 const database_1 = require("../../db/database");
 const checkOutAccess_1 = require("../../libs/checkOutAccess");
 const createArticle = (req, res) => __awaiter(void 0, void 0, void 0, function* () {

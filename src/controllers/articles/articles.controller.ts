@@ -1,7 +1,5 @@
 import { Request, Response } from 'express';
 import { Article } from '../../entities/Article';
-// import { Raw } from 'typeorm';
-// import { ArticleEntity } from '../../interfaces/articleEntity';
 import { AppDataSource } from '../../db/database';
 import { AuthorizationOw } from '../../libs/checkOutAccess';
 
