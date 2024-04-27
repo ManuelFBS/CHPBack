@@ -14,6 +14,7 @@ router.get('/article/:title', verifyToken_1.TokenValidation, articles_controller
 // http://localhost:7000/api/users/article/category/:category
 router.get('/article/category/:category', verifyToken_1.TokenValidation, articles_controller_1.getArticlesByCategory);
 // -------------------------------------------------------------------------------------------------- //
+router.get('/article/find/:id', verifyToken_1.TokenValidation, articles_controller_1.getArticleByID);
 router.patch('/article/edit/:id', verifyToken_1.TokenValidation, articles_controller_1.updateArticle);
 router.delete('/article/delete/:id', verifyToken_1.TokenValidation, articles_controller_1.deleteArticle);
 // router.delete('/article/delete', TokenValidation, deleteArticle);

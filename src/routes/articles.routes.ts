@@ -4,6 +4,7 @@ import {
   createArticle,
   deleteArticle,
   getAllArticles,
+  getArticleByID,
   getArticleByPartialTitle,
   getArticlesByCategory,
   updateArticle,
@@ -32,6 +33,12 @@ router.get(
   getArticlesByCategory,
 );
 // -------------------------------------------------------------------------------------------------- //
+
+router.get(
+  '/article/find/:id',
+  TokenValidation,
+  getArticleByID,
+);
 
 router.patch(
   '/article/edit/:id',
