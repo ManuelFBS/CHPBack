@@ -1,7 +1,7 @@
 import { DataSource } from 'typeorm';
 import { Article } from '../entities/Article';
 import { Comment } from '../entities/Comment';
-import { Schedule } from '../entities/Schedule';
+import { Appointment } from '../entities/Appointment';
 import { User } from '../entities/User';
 import dotenv from 'dotenv';
 
@@ -14,7 +14,7 @@ export const AppDataSource = new DataSource({
   password: process.env.DB_PASSWORD,
   port: parseInt(process.env.DB_PORT as any),
   database: process.env.DB_NAME,
-  entities: [Article, Comment, Schedule, User],
+  entities: [Article, Comment, Appointment, User],
   logging: false,
   synchronize: true,
 });

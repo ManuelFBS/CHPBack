@@ -7,7 +7,7 @@ exports.AppDataSource = void 0;
 const typeorm_1 = require("typeorm");
 const Article_1 = require("../entities/Article");
 const Comment_1 = require("../entities/Comment");
-const Schedule_1 = require("../entities/Schedule");
+const Appointment_1 = require("../entities/Appointment");
 const User_1 = require("../entities/User");
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
@@ -18,7 +18,7 @@ exports.AppDataSource = new typeorm_1.DataSource({
     password: process.env.DB_PASSWORD,
     port: parseInt(process.env.DB_PORT),
     database: process.env.DB_NAME,
-    entities: [Article_1.Article, Comment_1.Comment, Schedule_1.Schedule, User_1.User],
+    entities: [Article_1.Article, Comment_1.Comment, Appointment_1.Appointment, User_1.User],
     logging: false,
     synchronize: true,
 });

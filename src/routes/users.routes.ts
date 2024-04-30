@@ -8,6 +8,7 @@ import {
 import {
   getAllArticles,
   getArticleByPartialTitle,
+  getArticleByID,
   getArticlesByCategory,
 } from '../controllers/articles/articles.controller';
 import { createNewComment } from '../controllers/comments/comments.controller';
@@ -41,6 +42,12 @@ router.get(
   '/article/category/:category',
   TokenValidation,
   getArticlesByCategory,
+);
+
+router.get(
+  '/article/find/:id',
+  TokenValidation,
+  getArticleByID,
 );
 
 // -----------------------------------------------------------------------------------------------------------
