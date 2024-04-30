@@ -32,22 +32,11 @@ const createNewComment = (req, res) => __awaiter(void 0, void 0, void 0, functio
                 .status(404)
                 .json({ message: 'Article not found...!' });
         console.log('ID del artículo', article.id);
-        //     const newComment = Comment.create({
-        //       comment,
-        //       user,
-        //       article: [article],
-        //     });
         const newComment = new Comment_1.Comment();
         newComment.comment = comment;
         newComment.user = user;
         newComment.article = article;
         const savedComment = yield newComment.save();
-        //     const newComment = {
-        //       comment: comment,
-        //       userId: uID,
-        //       articleId: artID,
-        //     };
-        //     const userComment = await Comment.save(newComment);
         return res.status(200).json({
             message: 'The comment was added successfully...!',
         });

@@ -34,24 +34,12 @@ export const createNewComment = async (
 
     console.log('ID del artículo', article.id);
 
-    //     const newComment = Comment.create({
-    //       comment,
-    //       user,
-    //       article: [article],
-    //     });
     const newComment = new Comment();
     newComment.comment = comment;
     newComment.user = user;
     newComment.article = article;
 
     const savedComment = await newComment.save();
-
-    //     const newComment = {
-    //       comment: comment,
-    //       userId: uID,
-    //       articleId: artID,
-    //     };
-    //     const userComment = await Comment.save(newComment);
 
     return res.status(200).json({
       message: 'The comment was added successfully...!',
