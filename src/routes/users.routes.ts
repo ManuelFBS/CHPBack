@@ -5,6 +5,7 @@ import {
   getUserByEmailOrUsername,
   updateUser,
 } from '../controllers/users/users.controller';
+import { makeAppointment } from '../controllers/appointments/appointments.controller';
 import {
   getAllArticles,
   getArticleByPartialTitle,
@@ -56,6 +57,14 @@ router.post(
   '/user/article/comment/new',
   TokenValidation,
   createNewComment,
+);
+
+// -----------------------------------------------------------------------------------------------------------
+
+router.post(
+  'user/appointment/booker',
+  TokenValidation,
+  makeAppointment,
 );
 
 export default router;
