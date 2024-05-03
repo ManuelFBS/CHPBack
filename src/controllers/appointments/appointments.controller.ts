@@ -9,6 +9,7 @@ import { AppDataSource } from '../../db/database';
 // import nodemailer from 'nodemailer';
 import { transporter } from '../../config/mailer';
 import dotenv from 'dotenv';
+import { error } from 'console';
 
 dotenv.config();
 
@@ -91,7 +92,9 @@ export const makeAppointment = async (
       // html: `<p>Hola ${bookingUser.name} ${bookingUser.lastName}, tu cita ha sido reservada exotosamente para el ${appointmentDate} a las ${appointmentTime}.</p>`,
     };
 
-    await transporter.sendMail(mailOptions);
+    const mailer = await transporter.sendMail(mailOptions);
+
+    console.log(mailer);
 
     // ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- //
 
