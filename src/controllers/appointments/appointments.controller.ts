@@ -6,7 +6,18 @@ import {
   Appointment_Time,
 } from '../../entities/appointment.types';
 import { AppDataSource } from '../../db/database';
-import { isWithStatement } from 'typescript';
+import nodemailer from 'nodemailer';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+const transporter = nodemailer.createTransport({
+  service: 'Gmail',
+  auth: {
+    user: 'mfbsmail.fortesting@gmail.com',
+    pass: process.env.GKEY,
+  },
+});
 
 interface UserData {
   name?: string;
@@ -68,9 +79,20 @@ export const makeAppointment = async (
       newAppointment,
     );
 
-    // const bookingUser: any = await User.findOne({
-    //   where: { id: idUser },
-    // });
+    // ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- //
+
+    // Enviar email al usuario...
+    const mailOptions = {
+      from: 'mfbsmail.fortesting@gmail.com',
+      to: bookingUser.email,
+      subject: 'Cita reservada exitosamente',
+      text: `Hola ${bookingUser.name} ${bookingUser.lastName}, tu cita ha sido reservada exotosamente para el ${appointmentDate} a las ${appointmentTime}.`,
+      html: `<p>Hola ${bookingUser.name} ${bookingUser.lastName}, tu cita ha sido reservada exotosamente para el ${appointmentDate} a las ${appointmentTime}.</p>`,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    // ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- //
 
     const userData: UserData = {};
     userData.name = bookingUser.name;

@@ -8,12 +8,25 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.cancelledAppointment = exports.makeAppointment = void 0;
 const Appointment_1 = require("../../entities/Appointment");
 const User_1 = require("../../entities/User");
 const appointment_types_1 = require("../../entities/appointment.types");
 const database_1 = require("../../db/database");
+const nodemailer_1 = __importDefault(require("nodemailer"));
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
+const transporter = nodemailer_1.default.createTransport({
+    service: 'Gmail',
+    auth: {
+        user: 'mfbsmail.fortesting@gmail.com',
+        pass: process.env.GKEY,
+    },
+});
 const makeAppointment = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { idUser, appointmentDate, appointmentTime, appointmentStatus, } = req.body;
@@ -43,9 +56,17 @@ const makeAppointment = (req, res) => __awaiter(void 0, void 0, void 0, function
         newAppointment.appointmentTime = appointmentTime;
         newAppointment.appointmentStatus = appointmentStatus;
         const bookedAppointment = yield Appointment_1.Appointment.save(newAppointment);
-        // const bookingUser: any = await User.findOne({
-        //   where: { id: idUser },
-        // });
+        // ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- //
+        // Enviar email al usuario...
+        const mailOptions = {
+            from: 'mfbsmail.fortesting@gmail.com',
+            to: bookingUser.email,
+            subject: 'Cita reservada exitosamente',
+            text: `Hola ${bookingUser.name} ${bookingUser.lastName}, tu cita ha sido reservada exotosamente para el ${appointmentDate} a las ${appointmentTime}.`,
+            html: `<p>Hola ${bookingUser.name} ${bookingUser.lastName}, tu cita ha sido reservada exotosamente para el ${appointmentDate} a las ${appointmentTime}.</p>`,
+        };
+        yield transporter.sendMail(mailOptions);
+        // ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- //
         const userData = {};
         userData.name = bookingUser.name;
         userData.lastName = bookingUser.lastName;
