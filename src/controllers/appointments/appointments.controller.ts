@@ -84,7 +84,7 @@ export const makeAppointment = async (
 
     // Enviar email al usuario...
     const mailOptions = {
-      from: 'mfbsmail.fortesting@gmail.com',
+      from: 'manuelf.borrego@gmail.com',
       to: bookingUser.email,
       subject: 'Cita reservada exitosamente',
       text: `Hola ${bookingUser.name} ${bookingUser.lastName}, tu cita ha sido reservada exotosamente para el ${appointmentDate} a las ${appointmentTime}.`,
