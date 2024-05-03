@@ -88,7 +88,7 @@ export const makeAppointment = async (
       to: bookingUser.email,
       subject: 'Cita reservada exitosamente',
       text: `Hola ${bookingUser.name} ${bookingUser.lastName}, tu cita ha sido reservada exotosamente para el ${appointmentDate} a las ${appointmentTime}.`,
-      html: `<p>Hola ${bookingUser.name} ${bookingUser.lastName}, tu cita ha sido reservada exotosamente para el ${appointmentDate} a las ${appointmentTime}.</p>`,
+      // html: `<p>Hola ${bookingUser.name} ${bookingUser.lastName}, tu cita ha sido reservada exotosamente para el ${appointmentDate} a las ${appointmentTime}.</p>`,
     };
 
     await transporter.sendMail(mailOptions);
