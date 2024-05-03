@@ -6,18 +6,19 @@ import {
   Appointment_Time,
 } from '../../entities/appointment.types';
 import { AppDataSource } from '../../db/database';
-import nodemailer from 'nodemailer';
+// import nodemailer from 'nodemailer';
+import { transporter } from '../../config/mailer';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
-const transporter = nodemailer.createTransport({
-  service: 'Gmail',
-  auth: {
-    user: 'mfbsmail.fortesting@gmail.com',
-    pass: process.env.GKEY,
-  },
-});
+// const transporter = nodemailer.createTransport({
+//   service: 'Gmail',
+//   auth: {
+//     user: 'mfbsmail.fortesting@gmail.com',
+//     pass: process.env.GKEY,
+//   },
+// });
 
 interface UserData {
   name?: string;
