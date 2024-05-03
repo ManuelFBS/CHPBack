@@ -10,3 +10,8 @@ export enum Appointment_Time {
   DIECISIETE_HORAS = '17:00-17:50',
   DIECIOCHO_HORAS = '18:00-18:50',
 }
+
+export enum Appointment_Status {
+  ACTIVE = 'active',
+  CANCELLED = 'cancelled',
+}

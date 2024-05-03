@@ -1,6 +1,20 @@
 import { Request, Response } from 'express';
 import { Appointment } from '../../entities/Appointment';
-import { Appointment_Time } from '../../entities/appointment.time';
+import { User } from '../../entities/User';
+import {
+  Appointment_Status,
+  Appointment_Time,
+} from '../../entities/appointment.types';
+import { AppDataSource } from '../../db/database';
+import { isWithStatement } from 'typescript';
+
+interface UserData {
+  name?: string;
+  lastName?: string;
+  email?: string;
+  phoneNumber?: string;
+  userName?: string;
+}
 
 export const makeAppointment = async (
   req: Request,
@@ -8,57 +22,125 @@ export const makeAppointment = async (
 ): Promise<Response> => {
   try {
     const {
-      name,
-      lastName,
-      email,
-      phoneNumber,
       idUser,
       appointmentDate,
       appointmentTime,
-      cancelled,
+      appointmentStatus,
     }: {
-      name: string;
-      lastName: string;
-      email: string;
-      phoneNumber: string;
       idUser: number;
       appointmentDate: Date;
       appointmentTime: Appointment_Time;
-      cancelled: boolean;
+      appointmentStatus: Appointment_Status;
     } = req.body;
+
+    const bookingUser: any = await User.findOne({
+      where: { id: idUser },
+    });
+
+    if (!bookingUser)
+      return res
+        .status(404)
+        .json({ message: 'User not found...!' });
 
     // Buscar si ya existe una cita en la misma fecha y hora
     const existingAppointment = await Appointment.findOne({
       where: {
         appointmentDate,
         appointmentTime,
+        appointmentStatus: Appointment_Status.ACTIVE,
       },
     });
 
-    if (existingAppointment)
+    if (existingAppointment) {
       return res.status(401).json({
         message:
-          'Hora reservada previamente por otro usuario.\nDebe escoger otra hora u otro día disponible...!',
+          'Hora reservada previamente por otro usuario. Debe escoger otra hora u otro día disponible...!',
       });
+    }
 
     const newAppointment = new Appointment();
-    newAppointment.name = name;
-    newAppointment.lastName = lastName;
-    newAppointment.email = email;
-    newAppointment.phoneNumber = phoneNumber;
     newAppointment.idUser = idUser;
     newAppointment.appointmentDate = appointmentDate;
     newAppointment.appointmentTime = appointmentTime;
-    newAppointment.cancelled = cancelled;
+    newAppointment.appointmentStatus = appointmentStatus;
 
-    const reservedAppointment = await Appointment.save(
+    const bookedAppointment = await Appointment.save(
       newAppointment,
     );
 
+    // const bookingUser: any = await User.findOne({
+    //   where: { id: idUser },
+    // });
+
+    const userData: UserData = {};
+    userData.name = bookingUser.name;
+    userData.lastName = bookingUser.lastName;
+    userData.email = bookingUser.email;
+    userData.phoneNumber = bookingUser.phoneNumber;
+    userData.userName = bookingUser.userName;
+
     return res.status(201).json({
       message:
-        'The booked appointment has been booked successfully...!',
-      reservedAppointment,
+        'The appointment has been booked successfully...!',
+      userData,
+      bookedAppointment,
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      return res.status(500).json({ error: error.message });
+    } else {
+      return res.status(500).json(error);
+    }
+  }
+};
+
+export const cancelledAppointment = async (
+  req: Request,
+  res: Response,
+): Promise<Response> => {
+  try {
+    const {
+      idUser,
+      appointmentDate,
+      appointmentTime,
+      appointmentStatus,
+    }: {
+      idUser: number;
+      appointmentDate: Date;
+      appointmentTime: Appointment_Time;
+      appointmentStatus: Appointment_Status;
+    } = req.body;
+
+    const appointmentUser = await Appointment.findOne({
+      where: {
+        idUser,
+        appointmentDate,
+        appointmentTime,
+      },
+    });
+
+    if (!appointmentUser)
+      return res
+        .status(404)
+        .json({ message: 'Appointment not found...!' });
+
+    const dataSource = AppDataSource;
+    const dataAppointment: Appointment[] | any = {
+      appointmentStatus: appointmentStatus,
+    };
+
+    dataSource
+      .createQueryBuilder()
+      .update(Appointment)
+      .set(dataAppointment)
+      .where(
+        'idUser = :idUser AND appointmentDate = :appointmentDate AND appointmentTime = :appointmentTime',
+        { idUser, appointmentDate, appointmentTime },
+      )
+      .execute();
+
+    return res.status(201).json({
+      message: 'Your appointment has been cancelled...!',
     });
   } catch (error) {
     if (error instanceof Error) {

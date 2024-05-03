@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Appointment_Time = void 0;
+exports.Appointment_Status = exports.Appointment_Time = void 0;
 var Appointment_Time;
 (function (Appointment_Time) {
     Appointment_Time["OCHO_HORAS"] = "08:00-08:50";
@@ -14,4 +14,9 @@ var Appointment_Time;
     Appointment_Time["DIECISIETE_HORAS"] = "17:00-17:50";
     Appointment_Time["DIECIOCHO_HORAS"] = "18:00-18:50";
 })(Appointment_Time || (exports.Appointment_Time = Appointment_Time = {}));
-//# sourceMappingURL=appointment.time.js.map
+var Appointment_Status;
+(function (Appointment_Status) {
+    Appointment_Status["ACTIVE"] = "active";
+    Appointment_Status["CANCELLED"] = "cancelled";
+})(Appointment_Status || (exports.Appointment_Status = Appointment_Status = {}));
+//# sourceMappingURL=appointment.types.js.map

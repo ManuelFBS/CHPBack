@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const users_controller_1 = require("../controllers/users/users.controller");
+const appointments_controller_1 = require("../controllers/appointments/appointments.controller");
 const articles_controller_1 = require("../controllers/articles/articles.controller");
 const comments_controller_1 = require("../controllers/comments/comments.controller");
 const verifyToken_1 = require("../validations/tokens/verifyToken");
@@ -17,5 +18,8 @@ router.get('/article/category/:category', verifyToken_1.TokenValidation, article
 router.get('/article/find/:id', verifyToken_1.TokenValidation, articles_controller_1.getArticleByID);
 // -----------------------------------------------------------------------------------------------------------
 router.post('/user/article/comment/new', verifyToken_1.TokenValidation, comments_controller_1.createNewComment);
+// -----------------------------------------------------------------------------------------------------------
+router.post('/user/appointment/booker', verifyToken_1.TokenValidation, appointments_controller_1.makeAppointment);
+router.patch('/user/appointment/cancelled', verifyToken_1.TokenValidation, appointments_controller_1.cancelledAppointment);
 exports.default = router;
 //# sourceMappingURL=users.routes.js.map

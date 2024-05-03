@@ -286,7 +286,7 @@ export const updateArticle = async (
 
     return res
       .status(200)
-      .json({ messaege: 'Article has been updated...' });
+      .json({ message: 'Article has been updated...' });
   } catch (error) {
     if (error instanceof Error) {
       return res.status(500).json({ error: error.message });

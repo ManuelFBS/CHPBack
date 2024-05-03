@@ -222,7 +222,7 @@ const updateArticle = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             .execute();
         return res
             .status(200)
-            .json({ messaege: 'Article has been updated...' });
+            .json({ message: 'Article has been updated...' });
     }
     catch (error) {
         if (error instanceof Error) {

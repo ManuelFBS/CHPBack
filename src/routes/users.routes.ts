@@ -5,7 +5,10 @@ import {
   getUserByEmailOrUsername,
   updateUser,
 } from '../controllers/users/users.controller';
-import { makeAppointment } from '../controllers/appointments/appointments.controller';
+import {
+  cancelledAppointment,
+  makeAppointment,
+} from '../controllers/appointments/appointments.controller';
 import {
   getAllArticles,
   getArticleByPartialTitle,
@@ -62,9 +65,15 @@ router.post(
 // -----------------------------------------------------------------------------------------------------------
 
 router.post(
-  'user/appointment/booker',
+  '/user/appointment/booker',
   TokenValidation,
   makeAppointment,
+);
+
+router.patch(
+  '/user/appointment/cancelled',
+  TokenValidation,
+  cancelledAppointment,
 );
 
 export default router;

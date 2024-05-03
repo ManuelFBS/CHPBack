@@ -6,37 +6,15 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Appointment_Time } from './appointment.time';
+import {
+  Appointment_Status,
+  Appointment_Time,
+} from './appointment.types';
 
 @Entity()
 export class Appointment extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
-
-  @Column({
-    type: 'varchar',
-    length: 100,
-    nullable: false,
-  })
-  name: string;
-
-  @Column({
-    type: 'varchar',
-    length: 100,
-    nullable: false,
-  })
-  lastName: string;
-
-  @Column({
-    type: 'varchar',
-    length: 50,
-    unique: true,
-    nullable: false,
-  })
-  email: string;
-
-  @Column({ type: 'varchar', length: 20, nullable: false })
-  phoneNumber: string;
 
   @Column({ nullable: false })
   idUser: number;
@@ -47,8 +25,12 @@ export class Appointment extends BaseEntity {
   @Column({ type: 'enum', enum: Appointment_Time })
   appointmentTime: Appointment_Time;
 
-  @Column({ type: 'boolean', default: false })
-  cancelled: boolean;
+  @Column({
+    type: 'enum',
+    enum: Appointment_Status,
+    default: Appointment_Status.ACTIVE,
+  })
+  appointmentStatus: Appointment_Status;
 
   @CreateDateColumn()
   createdAt: Date;
