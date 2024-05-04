@@ -6,12 +6,13 @@ import {
   Appointment_Time,
 } from '../../entities/appointment.types';
 import { AppDataSource } from '../../db/database';
+import * as emailjs from 'emailjs';
+import { emailConfig } from '../../config/emailConfig';
 // import nodemailer from 'nodemailer';
-import { transporter } from '../../config/mailer';
-import dotenv from 'dotenv';
-import { error } from 'console';
+// import { transporter } from '../../config/mailer';
+// import dotenv from 'dotenv';
 
-dotenv.config();
+// dotenv.config();
 
 // const transporter = nodemailer.createTransport({
 //   service: 'Gmail',
@@ -84,17 +85,20 @@ export const makeAppointment = async (
     // ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- //
 
     // Enviar email al usuario...
-    const mailOptions = {
-      from: 'manuelf.borrego@gmail.com',
-      to: bookingUser.email,
-      subject: 'Cita reservada exitosamente',
-      text: `Hola ${bookingUser.name} ${bookingUser.lastName}, tu cita ha sido reservada exotosamente para el ${appointmentDate} a las ${appointmentTime}.`,
-      // html: `<p>Hola ${bookingUser.name} ${bookingUser.lastName}, tu cita ha sido reservada exotosamente para el ${appointmentDate} a las ${appointmentTime}.</p>`,
-    };
 
-    const mailer = await transporter.sendMail(mailOptions);
+    //const emailClient=e
 
-    console.log(mailer);
+    // const mailOptions = {
+    //   from: 'manuelf.borrego@gmail.com',
+    //   to: bookingUser.email,
+    //   subject: 'Cita reservada exitosamente',
+    //   text: `Hola ${bookingUser.name} ${bookingUser.lastName}, tu cita ha sido reservada exotosamente para el ${appointmentDate} a las ${appointmentTime}.`,
+    //   // html: `<p>Hola ${bookingUser.name} ${bookingUser.lastName}, tu cita ha sido reservada exotosamente para el ${appointmentDate} a las ${appointmentTime}.</p>`,
+    // };
+
+    // const mailer = await transporter.sendMail(mailOptions);
+
+    // console.log(mailer);
 
     // ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- //
 
