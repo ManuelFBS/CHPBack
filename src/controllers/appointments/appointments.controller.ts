@@ -80,7 +80,7 @@ export const makeAppointment = async (
       html: `<p>Hola ${bookingUser.name} ${bookingUser.lastName}, tu cita ha sido reservada exotosamente para el ${appointmentDate} a las ${appointmentTime}.</p>`,
     };
 
-    const mailer = await transporter.sendMail(
+    await transporter.sendMail(
       mailOptions,
       (error, info) => {
         if (error) {
