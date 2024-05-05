@@ -6,7 +6,9 @@ import {
   Appointment_Time,
 } from '../../entities/appointment.types';
 import { AppDataSource } from '../../db/database';
-import { transporter } from '../../config/mailer';
+import emailjs from 'emailjs-com';
+import { emailConfig } from '../../config/mailer';
+// import { transporter } from '../../config/mailer';
 
 interface UserData {
   name?: string;
@@ -71,25 +73,30 @@ export const makeAppointment = async (
     // ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- //
 
     // Enviar email al usuario...
+    const appointmentInfo = `Tu cita ha sido reservada para el ${appointmentDate} a las ${appointmentTime}.`;
 
-    const mailOptions = {
-      from: 'manuelf.borrego@gmail.com',
-      to: bookingUser.email,
-      subject: 'Cita reservada exitosamente',
-      text: `Hola ${bookingUser.name} ${bookingUser.lastName}, tu cita ha sido reservada exotosamente para el ${appointmentDate} a las ${appointmentTime}.`,
-      html: `<p>Hola ${bookingUser.name} ${bookingUser.lastName}, tu cita ha sido reservada exotosamente para el ${appointmentDate} a las ${appointmentTime}.</p>`,
-    };
+    await emailjs.send('Gmail', 'template_eb98nu7', {
+      to_email: bookingUser.email,
+      message: appointmentInfo,
+    });
+    // const mailOptions = {
+    //   from: 'manuelf.borrego@gmail.com',
+    //   to: bookingUser.email,
+    //   subject: 'Cita reservada exitosamente',
+    //   text: `Hola ${bookingUser.name} ${bookingUser.lastName}, tu cita ha sido reservada exotosamente para el ${appointmentDate} a las ${appointmentTime}.`,
+    //   html: `<p>Hola ${bookingUser.name} ${bookingUser.lastName}, tu cita ha sido reservada exotosamente para el ${appointmentDate} a las ${appointmentTime}.</p>`,
+    // };
 
-    await transporter.sendMail(
-      mailOptions,
-      (error, info) => {
-        if (error) {
-          throw Error(error.message);
-        } else {
-          console.log('Email sent...');
-        }
-      },
-    );
+    // await transporter.sendMail(
+    //   mailOptions,
+    //   (error, info) => {
+    //     if (error) {
+    //       throw Error(error.message);
+    //     } else {
+    //       console.log('Email sent...');
+    //     }
+    //   },
+    // );
 
     // console.log(mailer);
 
