@@ -6,9 +6,6 @@ import {
   Appointment_Time,
 } from '../../entities/appointment.types';
 import { AppDataSource } from '../../db/database';
-// import emailjs from 'emailjs-com';
-// import { emailConfig } from '../../config/mailer';
-// import { transporter } from '../../config/mailer';
 
 interface UserData {
   name?: string;
