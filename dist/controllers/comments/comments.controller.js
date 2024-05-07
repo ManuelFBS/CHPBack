@@ -9,10 +9,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createNewComment = void 0;
+exports.deleteComment = exports.createNewComment = void 0;
 const User_1 = require("../../entities/User");
 const Article_1 = require("../../entities/Article");
 const Comment_1 = require("../../entities/Comment");
+const vartype_1 = require("../../libs/vartype");
 const createNewComment = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { artID, comment, } = req.body;
     try {
@@ -51,4 +52,34 @@ const createNewComment = (req, res) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 exports.createNewComment = createNewComment;
+const deleteComment = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { email, userName, articleID, commentID, } = req.body;
+        let query = {};
+        if ((0, vartype_1.isEmailType)(email)) {
+            query = { where: { email: email } };
+        }
+        else {
+            query = { where: { userName: userName } };
+        }
+        const user = yield User_1.User.findOne(query);
+        if (!user)
+            return res
+                .status(404)
+                .json({ message: 'User not found...!' });
+        if (req.userRole !== 'owner')
+            return res.status(401).json({
+                message: 'You are not authorized to perform this operation...!',
+            });
+        const article = yield Article_1.Article.findOne({
+            where: { id: articleID },
+        });
+        if (!article)
+            return res
+                .status(404)
+                .json({ message: 'Article not found...!' });
+    }
+    catch (error) { }
+});
+exports.deleteComment = deleteComment;
 //# sourceMappingURL=comments.controller.js.map

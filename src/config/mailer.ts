@@ -7,7 +7,7 @@ export const emailConfig = {
   port: 587, // Cambia esto al puerto SMTP correspondiente
   secure: false,
   requireTLS: true,
-  user: 'manuelf.borrego@gmail.com', // Cambia esto a tu dirección de correo electrónico
+  user: 'oteroalan06@gmail.com', // Cambia esto a tu dirección de correo electrónico
   password: process.env.GKEY, // Cambia esto a tu contraseña
 };
 

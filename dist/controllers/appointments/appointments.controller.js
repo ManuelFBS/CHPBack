@@ -17,16 +17,7 @@ const Appointment_1 = require("../../entities/Appointment");
 const User_1 = require("../../entities/User");
 const appointment_types_1 = require("../../entities/appointment.types");
 const database_1 = require("../../db/database");
-const nodemailer_1 = __importDefault(require("nodemailer"));
-const dotenv_1 = __importDefault(require("dotenv"));
-dotenv_1.default.config();
-const transporter = nodemailer_1.default.createTransport({
-    service: 'Gmail',
-    auth: {
-        user: 'mfbsmail.fortesting@gmail.com',
-        pass: process.env.GKEY,
-    },
-});
+const emailjs_com_1 = __importDefault(require("emailjs-com"));
 const makeAppointment = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { idUser, appointmentDate, appointmentTime, appointmentStatus, } = req.body;
@@ -58,14 +49,29 @@ const makeAppointment = (req, res) => __awaiter(void 0, void 0, void 0, function
         const bookedAppointment = yield Appointment_1.Appointment.save(newAppointment);
         // ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- //
         // Enviar email al usuario...
-        const mailOptions = {
-            from: 'mfbsmail.fortesting@gmail.com',
-            to: bookingUser.email,
-            subject: 'Cita reservada exitosamente',
-            text: `Hola ${bookingUser.name} ${bookingUser.lastName}, tu cita ha sido reservada exotosamente para el ${appointmentDate} a las ${appointmentTime}.`,
-            html: `<p>Hola ${bookingUser.name} ${bookingUser.lastName}, tu cita ha sido reservada exotosamente para el ${appointmentDate} a las ${appointmentTime}.</p>`,
-        };
-        yield transporter.sendMail(mailOptions);
+        const appointmentInfo = `Tu cita ha sido reservada para el ${appointmentDate} a las ${appointmentTime}.`;
+        yield emailjs_com_1.default.send('Gmail', 'template_eb98nu7', {
+            to_email: bookingUser.email,
+            message: appointmentInfo,
+        });
+        // const mailOptions = {
+        //   from: 'manuelf.borrego@gmail.com',
+        //   to: bookingUser.email,
+        //   subject: 'Cita reservada exitosamente',
+        //   text: `Hola ${bookingUser.name} ${bookingUser.lastName}, tu cita ha sido reservada exotosamente para el ${appointmentDate} a las ${appointmentTime}.`,
+        //   html: `<p>Hola ${bookingUser.name} ${bookingUser.lastName}, tu cita ha sido reservada exotosamente para el ${appointmentDate} a las ${appointmentTime}.</p>`,
+        // };
+        // await transporter.sendMail(
+        //   mailOptions,
+        //   (error, info) => {
+        //     if (error) {
+        //       throw Error(error.message);
+        //     } else {
+        //       console.log('Email sent...');
+        //     }
+        //   },
+        // );
+        // console.log(mailer);
         // ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- //
         const userData = {};
         userData.name = bookingUser.name;
