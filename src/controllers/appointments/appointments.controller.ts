@@ -6,8 +6,8 @@ import {
   Appointment_Time,
 } from '../../entities/appointment.types';
 import { AppDataSource } from '../../db/database';
-import emailjs from 'emailjs-com';
-import { emailConfig } from '../../config/mailer';
+// import emailjs from 'emailjs-com';
+// import { emailConfig } from '../../config/mailer';
 // import { transporter } from '../../config/mailer';
 
 interface UserData {
@@ -73,12 +73,8 @@ export const makeAppointment = async (
     // ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- //
 
     // Enviar email al usuario...
-    const appointmentInfo = `Tu cita ha sido reservada para el ${appointmentDate} a las ${appointmentTime}.`;
+    //
 
-    await emailjs.send('Gmail', 'template_eb98nu7', {
-      to_email: bookingUser.email,
-      message: appointmentInfo,
-    });
     // const mailOptions = {
     //   from: 'manuelf.borrego@gmail.com',
     //   to: bookingUser.email,
