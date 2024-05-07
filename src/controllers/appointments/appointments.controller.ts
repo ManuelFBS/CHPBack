@@ -70,34 +70,6 @@ export const makeAppointment = async (
       newAppointment,
     );
 
-    // ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- //
-
-    // Enviar email al usuario...
-    //
-
-    // const mailOptions = {
-    //   from: 'manuelf.borrego@gmail.com',
-    //   to: bookingUser.email,
-    //   subject: 'Cita reservada exitosamente',
-    //   text: `Hola ${bookingUser.name} ${bookingUser.lastName}, tu cita ha sido reservada exotosamente para el ${appointmentDate} a las ${appointmentTime}.`,
-    //   html: `<p>Hola ${bookingUser.name} ${bookingUser.lastName}, tu cita ha sido reservada exotosamente para el ${appointmentDate} a las ${appointmentTime}.</p>`,
-    // };
-
-    // await transporter.sendMail(
-    //   mailOptions,
-    //   (error, info) => {
-    //     if (error) {
-    //       throw Error(error.message);
-    //     } else {
-    //       console.log('Email sent...');
-    //     }
-    //   },
-    // );
-
-    // console.log(mailer);
-
-    // ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- //
-
     const userData: UserData = {};
     userData.name = bookingUser.name;
     userData.lastName = bookingUser.lastName;
