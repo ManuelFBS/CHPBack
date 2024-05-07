@@ -15,6 +15,7 @@ interface UserData {
   userName?: string;
 }
 
+// Crear citas...
 export const makeAppointment = async (
   req: Request,
   res: Response,
