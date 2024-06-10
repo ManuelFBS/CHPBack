@@ -7,7 +7,7 @@ import authSuperAdmin from './routes/auth-SupAdm.routes';
 import authRoutes from './routes/auth.routes';
 import usersRoutes from './routes/users.routes';
 import articleRoutes from './routes/articles.routes';
-
+//
 dotenv.config();
 
 const app: Application = express();
