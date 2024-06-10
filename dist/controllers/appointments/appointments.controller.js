@@ -18,6 +18,12 @@ const database_1 = require("../../db/database");
 const makeAppointment = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { idUser, appointmentDate, appointmentTime, appointmentStatus, } = req.body;
+        const parsedDate = new Date(appointmentDate);
+        if (isNaN(parsedDate.getTime())) {
+            return res
+                .status(400)
+                .json({ message: 'Invalid date format...' });
+        }
         const bookingUser = yield User_1.User.findOne({
             where: { id: idUser },
         });
@@ -28,7 +34,7 @@ const makeAppointment = (req, res) => __awaiter(void 0, void 0, void 0, function
         // Buscar si ya existe una cita en la misma fecha y hora
         const existingAppointment = yield Appointment_1.Appointment.findOne({
             where: {
-                appointmentDate,
+                appointmentDate: parsedDate,
                 appointmentTime,
                 appointmentStatus: appointment_types_1.Appointment_Status.ACTIVE,
             },
@@ -40,7 +46,7 @@ const makeAppointment = (req, res) => __awaiter(void 0, void 0, void 0, function
         }
         const newAppointment = new Appointment_1.Appointment();
         newAppointment.idUser = idUser;
-        newAppointment.appointmentDate = appointmentDate;
+        newAppointment.appointmentDate = parsedDate;
         newAppointment.appointmentTime = appointmentTime;
         newAppointment.appointmentStatus = appointmentStatus;
         const bookedAppointment = yield Appointment_1.Appointment.save(newAppointment);

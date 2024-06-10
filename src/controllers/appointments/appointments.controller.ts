@@ -28,10 +28,18 @@ export const makeAppointment = async (
       appointmentStatus,
     }: {
       idUser: number;
-      appointmentDate: Date;
+      // appointmentDate: Date;
+      appointmentDate: string;
       appointmentTime: Appointment_Time;
       appointmentStatus: Appointment_Status;
     } = req.body;
+
+    const parsedDate = new Date(appointmentDate);
+    if (isNaN(parsedDate.getTime())) {
+      return res
+        .status(400)
+        .json({ message: 'Invalid date format...' });
+    }
 
     const bookingUser: any = await User.findOne({
       where: { id: idUser },
@@ -45,7 +53,7 @@ export const makeAppointment = async (
     // Buscar si ya existe una cita en la misma fecha y hora
     const existingAppointment = await Appointment.findOne({
       where: {
-        appointmentDate,
+        appointmentDate: parsedDate,
         appointmentTime,
         appointmentStatus: Appointment_Status.ACTIVE,
       },
@@ -60,7 +68,7 @@ export const makeAppointment = async (
 
     const newAppointment = new Appointment();
     newAppointment.idUser = idUser;
-    newAppointment.appointmentDate = appointmentDate;
+    newAppointment.appointmentDate = parsedDate;
     newAppointment.appointmentTime = appointmentTime;
     newAppointment.appointmentStatus = appointmentStatus;
 
