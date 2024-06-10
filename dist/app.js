@@ -12,6 +12,7 @@ const auth_SupAdm_routes_1 = __importDefault(require("./routes/auth-SupAdm.route
 const auth_routes_1 = __importDefault(require("./routes/auth.routes"));
 const users_routes_1 = __importDefault(require("./routes/users.routes"));
 const articles_routes_1 = __importDefault(require("./routes/articles.routes"));
+//
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 // Settings...
